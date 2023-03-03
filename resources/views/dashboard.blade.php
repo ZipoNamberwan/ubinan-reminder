@@ -9,10 +9,10 @@
 @section('breadcrumb')
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
-        <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="javascript:;">Pages</a></li>
-        <li class="breadcrumb-item text-sm text-white active" aria-current="page">Billing</li>
+        <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="/">Home</a></li>
+        <li class="breadcrumb-item text-sm text-white active" aria-current="page">Dashboard</li>
     </ol>
-    <h6 class="font-weight-bolder text-white mb-0">Billing</h6>
+    <h6 class="font-weight-bolder text-white mb-0">Dashboard</h6>
 </nav>
 @endsection
 
@@ -43,35 +43,29 @@
     <!-- Table -->
     <div class="row">
         <div class="col">
-            <div class="card">
-                <!-- Card header -->
-                <div class="card-header">
-                    <div class="row">
-                        <div class="col-md-9">
-                            <h3 class="card-title mb-2">Daftar Petugas Pengolahan</h3>
-                        </div>
-                        <div class="col-md-3 text-right">
-                            <a href="{{url('/mitra/create')}}" class="btn btn-primary btn-round btn-icon" data-toggle="tooltip" data-original-title="Tambah Mitra">
-                                <span class="btn-inner--icon"><i class="fas fa-plus-circle"></i></span>
-                                <span class="btn-inner--text">Tambah Mitra</span>
-                            </a>
-                        </div>
-                    </div>
+            <div class="card z-index-2 h-100">
+                <div class="card-header pb-0 pt-3 bg-transparent">
+                    <h4 class="text-capitalize">Dashboard</h4>
+                    <!-- <p class="text-sm mb-0">
+                        <i class="fa fa-arrow-up text-success"></i>
+                        <span class="font-weight-bold">4% more</span> in 2021
+                    </p> -->
                 </div>
-
-                <div class="table-responsive py-4">
-                    <table class="table" id="datatable-id" width="100%">
-                        <thead class="thead-light">
-                            <tr>
-                                <th>Nama</th>
-                                <th>Username</th>
-                                <th>Shift</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
+                <div class="card-body p-3">
+                    <div class="table-responsive py-4">
+                        <table class="table align-items-center mb-0" id="datatable-id" width="100%">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Nama</th>
+                                    <th>Jagung</th>
+                                    <th>Ubi Jalar</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
