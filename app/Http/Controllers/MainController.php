@@ -27,7 +27,12 @@ class MainController extends Controller
 
     public function harvestSchedule()
     {
-        # code...
+        $current_month = intval(date("m"));
+        $currentsubround = (int) (floor($current_month / 4) + 1);
+
+        $subrounds = [1, 2, 3];
+
+        return view('admin.monthly-schedule-monitoring', ['subrounds' => $subrounds, 'currentsubround' => $currentsubround]);
     }
 
     public function reminder()
@@ -71,12 +76,11 @@ class MainController extends Controller
             $year = Year::find($request->year)->id;
             $ms = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->get();
 
-            MonthlySchedule::destroy($ms->pluck('id'));
-
             Excel::import(new MonthlyScheduleImport($request->year, $request->subround), $request->file('file'));
 
+            MonthlySchedule::destroy($ms->pluck('id'));
+
             return redirect('/upload')->with('success-create', 'Data Jadwal Ubinan Bulanan telah disimpan!');
-            
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             $formattedFailures = [];
             $failures = $e->failures();
