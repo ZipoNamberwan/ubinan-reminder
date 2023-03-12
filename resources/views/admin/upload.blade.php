@@ -10,7 +10,7 @@
 @endsection
 
 @section('container')
-<div class="header bg-primary pb-6">
+<div class="header bg-success pb-6">
     <div class="container-fluid">
         <div class="header-body">
             <div class="row align-items-center py-4">
@@ -19,7 +19,7 @@
                         <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
                             <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
                             <li class="breadcrumb-item"><a href="/">Home</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Upload Jadwal Ubinan</li>
+                            <li class="breadcrumb-item active" aria-current="page">Upload Jadwal Ubinan Bulanan</li>
                         </ol>
                     </nav>
                 </div>
@@ -29,6 +29,26 @@
 </div>
 
 <div class="container-fluid mt--6">
+    @if (session('success-edit') || session('success-create'))
+    <div class="alert alert-primary alert-dismissible fade show" role="alert">
+        <span class="alert-icon"><i class="fas fa-check-circle"></i></span>
+        <span class="alert-text"><strong>Sukses! </strong>{{ session('success-create') }} {{ session('success-edit') }}</span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">×</span>
+        </button>
+    </div>
+    @endif
+
+    @if (session('success-delete'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span class="alert-icon"><i class="fas fa-check-circle"></i></span>
+        <span class="alert-text"><strong>Sukses! </strong>{{ session('success-delete') }}</span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">×</span>
+        </button>
+    </div>
+    @endif
+
     <div class="row">
         <div class="col">
             <div class="card-wrapper">
@@ -36,8 +56,8 @@
                 <div class="card">
                     <!-- Card header -->
                     <div class="card-header pb-0">
-                        <h3>Upload Jadwal Ubinan</h3>
-                        <p class="text-sm"><span>Upload dilakukan setiap Subround. Perhatian! Melakukan upload akan menghapus semua jadwal ubinan dan jadwal panen yang sudah diupload sebelumnya dalam satu Subround</span></p>
+                        <h3>Upload Jadwal Ubinan Bulanan</h3>
+                        <p class="text-sm"><span>Upload dilakukan setiap Subround. Perhatian! Melakukan upload akan menghapus semua jadwal ubinan bulanan dan jadwal panen yang sudah diupload sebelumnya dalam satu Subround</span></p>
                     </div>
                     <!-- Card body -->
                     <div class="card-body">
@@ -52,6 +72,42 @@
                         </form>
                         <form id="formupload" autocomplete="off" method="post" action="/upload" class="needs-validation" enctype="multipart/form-data" novalidate>
                             @csrf
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-control-label">Tahun</span></label>
+                                    <select id="year" name="year" class="form-control" data-toggle="select" name="year" required>
+                                        <option value="0" disabled selected> -- Pilih Tahun -- </option>
+                                        @foreach ($years as $year)
+                                        <option value="{{$year->id}}" {{ old('year', $currentyear->id) == $year->id ? 'selected' : '' }}>
+                                            {{ $year->name }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                    @error('year')
+                                    <div class="text-valid mt-2">
+                                        {{ $message }}
+                                    </div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-control-label">Subround</span></label>
+                                    <select id="subround" name="subround" class="form-control" data-toggle="select" name="subround" required>
+                                        <option value="0" disabled selected> -- Pilih Subround -- </option>
+                                        @foreach ($subrounds as $subround)
+                                        <option value="{{$subround}}" {{ old('subround') == $subround ? 'selected' : '' }}>
+                                            {{ $subround }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                    @error('subround')
+                                    <div class="text-valid mt-2">
+                                        {{ $message }}
+                                    </div>
+                                    @enderror
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <label class="form-control-label" for="file">File Upload</label>
@@ -98,23 +154,26 @@
         event.preventDefault();
         document.getElementById('loading-background').style.display = 'block'
 
+        var year = document.getElementById("year");
+        var idyear = year.options[year.selectedIndex].value;
+
+        var subround = document.getElementById("subround");
+        var idsubround = subround.options[subround.selectedIndex].value;
+
         var file_data = $('#file').prop('files')[0];
-        if (file_data == null) {
+        if (file_data == null || idyear == null || idsubround == null) {
             document.getElementById('formupload').submit();
         } else {
             var form_data = new FormData();
             form_data.append('file', file_data);
 
+            document.getElementById('sbmtbtn').disabled = true
             $.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                url: '/check-upload',
-                type: 'POST',
-                data: form_data,
-                contentType: false,
-                processData: false,
+                url: '/check-upload/' + idyear + '/' + idsubround,
+                type: 'GET',
                 success: function(response) {
+                    document.getElementById('sbmtbtn').disabled = false
+                    console.log(response)
                     if (response.is_data_exist === true) {
                         Swal.fire({
                             title: 'Perhatian',
@@ -128,8 +187,9 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 document.getElementById('formupload').submit();
+                            } else {
+                                document.getElementById('loading-background').style.display = 'none'
                             }
-                            document.getElementById('loading-background').style.display = 'none'
                         })
                     } else {
                         document.getElementById('formupload').submit();
@@ -137,6 +197,7 @@
 
                 },
                 error: function(jqXHR, textStatus, errorMessage) {
+                    document.getElementById('sbmtbtn').disabled = false
                     console.log('Error uploading file: ' + errorMessage);
                     document.getElementById('loading-background').style.display = 'none'
                 }

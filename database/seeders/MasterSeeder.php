@@ -52,6 +52,7 @@ class MasterSeeder extends Seeder
         Commodity::create(['name' => 'Ubi Kayu']);
         Commodity::create(['name' => 'Ubi Jalar']);
         Commodity::create(['name' => 'Kacang Hijau']);
+        Commodity::create(['name' => 'Kacang Tanah']);
 
         Role::create(['name' => 'supervisor']);
         Role::create(['name' => 'member']);

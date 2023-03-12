@@ -18,6 +18,15 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 
 class MonthlyScheduleImport implements ToModel, WithHeadingRow, WithValidation, WithBatchInserts
 {
+
+    public $year;
+    public $subround;
+
+    public function __construct($year, $subround)
+    {
+        $this->year = $year;
+        $this->subround = $subround;
+    }
     /**
      * @param array $row
      *
@@ -27,8 +36,8 @@ class MonthlyScheduleImport implements ToModel, WithHeadingRow, WithValidation, 
     {
         return new MonthlySchedule([
             'user_id' => User::where(['email' => $row['email_petugas']])->first()->id,
-            'month_id' => Month::find(($row['sub_round'] - 1) * 4 + $row['panen'])->id,
-            'year_id' => Year::where(['name' => $row['tahun']])->first()->id,
+            'month_id' => Month::find(($this->subround - 1) * 4 + $row['panen'])->id,
+            'year_id' => Year::find($this->year)->id,
             'commodity_id' => Commodity::where(['name' => $row['komoditas']])->first()->id,
             'bs_id' => Bs::where(['code' => ($row['kode_kec'] . $row['kode_desa'] . $row['nbs'])])->first()->id,
             'address' => $row['alamat'],
@@ -45,13 +54,9 @@ class MonthlyScheduleImport implements ToModel, WithHeadingRow, WithValidation, 
     public function rules(): array
     {
         return [
-            '*.tahun' => ['required', Rule::in(Year::all()->pluck('name'))],
-            '*.sub_round' => ['required', 'numeric', Rule::in([1, 2, 3])],
             '*.kode_kec' => 'required',
             '*.kode_desa' => 'required',
             '*.nbs' => 'required',
-            // '*.nbs' => ['required', 'area_rule:*.kode_kec,*.kode_desa,*.nbs'],
-            // '*.nbs' => ['required', (new AreaRule('*.kode_kec', '*.kode_desa', '*.kode_nbs'))],
             '*.nama_sls' => 'required',
             '*.nks' => 'required',
             '*.no_sample' => 'required',
@@ -67,10 +72,6 @@ class MonthlyScheduleImport implements ToModel, WithHeadingRow, WithValidation, 
     public function customValidationMessages()
     {
         return [
-            'tahun.required' => ':attribute kosong',
-            'tahun.in' => ':attribute tidak ada dalam master',
-            'sub_round.required' => ':attribute kosong',
-            'sub_round.in' => ':attribute tidak valid',
             'kode_kec.required' => ':attribute kosong',
             'kode_desa.required' => ':attribute kosong',
             'nbs.required' => ':attribute kosong',
@@ -92,8 +93,6 @@ class MonthlyScheduleImport implements ToModel, WithHeadingRow, WithValidation, 
     public function customValidationAttributes()
     {
         return [
-            'tahun' => 'Tahun',
-            'sub_round' => 'Sub Round',
             'kode_kec' => 'Kode Kecamatan',
             'kode_desa' => 'Kode Desa',
             'nbs' => 'Kode Blok Sensus',

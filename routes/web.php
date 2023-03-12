@@ -22,7 +22,7 @@ Route::get('/reminder', [MainController::class, 'reminder']);
 Route::get('/manual-reminder', [MainController::class, 'manualReminder']);
 Route::get('/upload', [MainController::class, 'showUploadForm']);
 Route::post('/upload', [MainController::class, 'uploadSchedule']);
-Route::post('/check-upload', [MainController::class, 'checkUpload']);
+Route::get('/check-upload/{year}/{subround}', [MainController::class, 'checkUpload']);
 Route::post('/template', [MainController::class, 'generateTemplate']);
 Route::get('/petugas', [UserController::class, 'index']);
 Route::get('/pengaturan', [MainController::class, 'settings']);

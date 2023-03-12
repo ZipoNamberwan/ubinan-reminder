@@ -3,9 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\NoScheduleException;
+use App\Helpers\Utilities;
 use App\Imports\MonthlyScheduleImport;
 use App\Imports\MonthlyScheduleImportCheck;
+use App\Models\Month;
+use App\Models\MonthlySchedule;
 use App\Models\User;
+use App\Models\Year;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
@@ -35,12 +40,23 @@ class MainController extends Controller
     }
     public function showUploadForm()
     {
-        return view('admin.upload');
+        $years = Year::all();
+        $currentyear = Year::firstWhere('name', date("Y"));
+
+        if ($currentyear == null) {
+            $currentyear = Year::all()->last();
+        }
+
+        $subrounds = [1, 2, 3];
+
+        return view('admin.upload', ['years' => $years, 'currentyear' => $currentyear, 'subrounds' => $subrounds]);
     }
     public function uploadSchedule(Request $request)
     {
         $rules = [
             'file' => 'required',
+            'year' => 'required',
+            'subround' => 'required',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -49,18 +65,42 @@ class MainController extends Controller
         }
 
         try {
-            Excel::import(new MonthlyScheduleImport, $request->file('file'));
+            $max = $request->subround * 4;
+            $min = $max - 3;
+            $months = range($min, $max);
+            $year = Year::find($request->year)->id;
+            $ms = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->get();
+
+            MonthlySchedule::destroy($ms->pluck('id'));
+
+            Excel::import(new MonthlyScheduleImport($request->year, $request->subround), $request->file('file'));
+
+            return redirect('/upload')->with('success-create', 'Data Jadwal Ubinan Bulanan telah disimpan!');
+            
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $formattedFailures = [];
             $failures = $e->failures();
-
-            dd($failures);
-
             foreach ($failures as $failure) {
                 $failure->row();
                 $failure->attribute();
                 $failure->errors();
                 $failure->values();
+                if (!array_key_exists($failure->row(), $formattedFailures)) {
+                    $row = [$failure->attribute()];
+                    $formattedFailures[$failure->row()] = $row;
+                } else {
+                    $formattedFailures[$failure->row()][] = $failure->attribute();
+                }
             }
+
+            ksort($formattedFailures);
+
+            $failures = [];
+            foreach ($formattedFailures as $key => $value) {
+                $failures[$key] = Utilities::getSentenceFromArray($value);
+            }
+
+            return view('admin.failed-upload', ['failures' => $failures]);
         }
     }
     public function settings()
@@ -69,12 +109,16 @@ class MainController extends Controller
     }
     public function checkUpload(Request $request)
     {
-        try {
-            Excel::import(new MonthlyScheduleImportCheck, $request->file('file'));
-        } catch (NoScheduleException $e) {
+        $max = $request->subround * 4;
+        $min = $max - 3;
+        $months = range($min, $max);
+        $year = Year::find($request->year)->id;
+        $ms = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->get();
+        if (count($ms) > 0) {
             return ['is_data_exist' => true];
+        } else {
+            return ['is_data_exist' => false];
         }
-        return ['is_data_exist' => false];
     }
     public function generateTemplate()
     {
@@ -82,35 +126,26 @@ class MainController extends Controller
 
         // Add some data to the first sheet
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setCellValue('A1', 'tahun');
-        $sheet->setCellValue('B1', 'sub_round');
-        $sheet->setCellValue('C1', 'kode_kec');
-        $sheet->setCellValue('D1', 'kode_desa');
-        $sheet->setCellValue('E1', 'nbs');
-        $sheet->setCellValue('F1', 'nama_sls');
-        $sheet->setCellValue('G1', 'nks');
-        $sheet->setCellValue('H1', 'no_sample');
-        $sheet->setCellValue('I1', 'nama_krt');
-        $sheet->setCellValue('J1', 'alamat');
-        $sheet->setCellValue('K1', 'komoditas');
-        $sheet->setCellValue('L1', 'panen');
-        $sheet->setCellValue('M1', 'jenis_sampel');
-        $sheet->setCellValue('N1', 'email_petugas');
+        $sheet->setTitle('Template');
+        $sheet->setCellValue('A1', 'kode_kec');
+        $sheet->setCellValue('B1', 'kode_desa');
+        $sheet->setCellValue('C1', 'nbs');
+        $sheet->setCellValue('D1', 'nama_sls');
+        $sheet->setCellValue('E1', 'nks');
+        $sheet->setCellValue('F1', 'no_sample');
+        $sheet->setCellValue('G1', 'nama_krt');
+        $sheet->setCellValue('H1', 'alamat');
+        $sheet->setCellValue('I1', 'komoditas');
+        $sheet->setCellValue('J1', 'panen');
+        $sheet->setCellValue('K1', 'jenis_sampel');
+        $sheet->setCellValue('L1', 'email_petugas');
 
         $sheet = $spreadsheet->createSheet();
         $sheet->setTitle('Penjelasan Template');
-        $sheet->setCellValue('A1', 'Nama Kolom');
-        $sheet->setCellValue('B1', 'Variabel');
-        $sheet->setCellValue('C1', 'Penjelasan');
-        $sheet->setCellValue('D1', 'Nilai yang bisa diisi');
-        $sheet->setCellValue('A2', 'tahun');
-        $sheet->setCellValue('B2', 'Tahun');
-        $sheet->setCellValue('C2', 'Isikan tahun survei ubinan. Contoh: 2023');
-        $sheet->setCellValue('D2', '2023' . "\n" . '2024');
-        $sheet->setCellValue('A3', 'sub_round');
-        $sheet->setCellValue('B3', 'Subround');
-        $sheet->setCellValue('C3', 'Isikan subround survei ubinan. Contoh: 1');
-        $sheet->setCellValue('D3', '1' . "\n" . '2' . "\n" . '3');
+        $sheet->setCellValue('A3', 'Nama Kolom');
+        $sheet->setCellValue('B3', 'Variabel');
+        $sheet->setCellValue('C3', 'Penjelasan');
+        $sheet->setCellValue('D3', 'Nilai yang bisa diisi');
         $sheet->setCellValue('A4', 'kode_kec, kode_desa, dan nbs');
         $sheet->setCellValue('B4', 'Kode Kecamatan, Kode Desa dan Nomor Blok Sensus');
         $sheet->setCellValue('C4', 'Isikan kode kecamatan, kode desa dan nomor blok sensus. Contoh: 010, 009, 001B');
@@ -169,7 +204,7 @@ class MainController extends Controller
         $alignment->setWrapText(true);
 
 
-        $style = $sheet->getStyle('A1:Z1');
+        $style = $sheet->getStyle('A3:Z3');
         $font = $style->getFont();
         $font->setBold(true);
         $font->setSize(14);
@@ -190,6 +225,14 @@ class MainController extends Controller
             $sheet->setCellValue('B' . $i, $user->email);
             $i++;
         }
+
+        $spreadsheet->setActiveSheetIndex(0);
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $style = $sheet->getStyle('A1:Z1');
+        $font = $style->getFont();
+        $font->setBold(true);
+        $font->setSize(11);
 
         // Create a writer object
         $writer = new Xlsx($spreadsheet);
