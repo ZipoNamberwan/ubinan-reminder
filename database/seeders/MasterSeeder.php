@@ -109,15 +109,15 @@ class MasterSeeder extends Seeder
         ]);
 
         $subdistrict =  Subdistrict::create(
-            ['name' => 'Sumber', 'code' => '020']
+            ['name' => 'Sukapura', 'code' => '020']
         );
 
         $village = Village::create(
-            ['name' => 'Sumber', 'code' => '020009', 'subdistrict_id' => $subdistrict->id]
+            ['name' => 'Ngadisari', 'code' => '020009', 'subdistrict_id' => $subdistrict->id]
         );
 
         Bs::create(
-            ['name' => 'Sumber', 'code' => '020009004B', 'village_id' => $village->id]
+            ['name' => '004B', 'code' => '020009004B', 'village_id' => $village->id]
         );
 
         SampleType::create(['name' => 'Utama']);

@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MonthlySchedule extends Model
 {
     use HasFactory;
     protected $guarded = [];
+    use SoftDeletes;
 
     public function harvestSchedule()
     {
@@ -33,5 +35,9 @@ class MonthlySchedule extends Model
     public function sampleType()
     {
         return $this->belongsTo(SampleType::class, 'sample_type_id');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

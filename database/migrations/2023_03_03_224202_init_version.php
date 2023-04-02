@@ -70,7 +70,7 @@ return new class extends Migration
         Schema::create('harvest_schedules', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->date('date');
-            $table->string('repondent_name')->nullable();
+            $table->string('respondent_name')->nullable();
             $table->text('note')->nullable();
             $table->integer('reminder_num')->default(0);
             $table->unsignedBigInteger('monthly_schedule_id')->unique();

@@ -29,6 +29,27 @@
 </div>
 
 <div class="container-fluid mt--6">
+
+    @if (session('success-edit') || session('success-create'))
+    <div class="alert alert-primary alert-dismissible fade show" role="alert">
+        <span class="alert-icon"><i class="fas fa-check-circle"></i></span>
+        <span class="alert-text"><strong>Sukses! </strong>{{ session('success-create') }} {{ session('success-edit') }}</span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">×</span>
+        </button>
+    </div>
+    @endif
+
+    @if (session('success-delete'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span class="alert-icon"><i class="fas fa-check-circle"></i></span>
+        <span class="alert-text"><strong>Sukses! </strong>{{ session('success-delete') }}</span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">×</span>
+        </button>
+    </div>
+    @endif
+
     <div class="row">
         <div class="col">
             <div class="card-wrapper">
@@ -36,8 +57,25 @@
                 <div class="card">
                     <!-- Card header -->
                     <div class="card-header pb-0">
-                        <h3>Monitoring Jadwal Panen</h3>
-                        <p class="text-sm"><span>Tabel berikut menampilkan Jadwal Panen Bulanan dan Tanggal Perkiraan Panen.</span></p>
+                        <div class="row">
+                            <div class="col-md-7">
+                                <h3>Monitoring Jadwal Panen</h3>
+                                <p class="text-sm"><span>Tabel berikut menampilkan Jadwal Panen Bulanan dan Tanggal Perkiraan Panen.</span></p>
+                            </div>
+                            <div class="col-md-5 text-right">
+                                <a href="{{url('/jadwal-panen/create')}}" class="btn btn-primary btn-round btn-icon" data-toggle="tooltip" data-original-title="Tambah Jadwal Panen">
+                                    <span class="btn-inner--icon"><i class="fas fa-plus-circle"></i></span>
+                                    <span class="btn-inner--text">Tambah Jadwal</span>
+                                </a>
+                                <form class="d-inline" method="POST" action="/jadwal-panen/download" data-toggle="tooltip" data-original-title="Unduh Jadwal Panen">
+                                    @csrf
+                                    <button class="btn btn-icon btn-outline-primary" type="submit">
+                                        <span class="btn-inner--icon"><i class="fas fa-download"></i></span>
+                                        <span class="btn-inner--text">Download</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                     <!-- Card body -->
                     <div class="card-body">
@@ -61,6 +99,7 @@
                                         <tr>
                                             <th>Identitas Sampel</th>
                                             <!-- Identitas Sampel mencakup kode kec, kode desa, kode sls, nbs, nks, no sampel, nama krt dan alamat -->
+                                            <th>Responden</th>
                                             <th>Komoditas</th>
                                             <th>Bulan Panen</th>
                                             <th>Jenis Sampel</th>
@@ -86,5 +125,122 @@
 @section('optionaljs')
 <script src="/assets/vendor/select2/dist/js/select2.min.js"></script>
 <script src="/assets/vendor/sweetalert2/dist/sweetalert2.js"></script>
+<script src="/assets/vendor/datatables2/datatables.min.js"></script>
+
+<script>
+    var table = $('#datatable-id').DataTable({
+        "order": [],
+        "serverSide": true,
+        "processing": true,
+        "ajax": {
+            "url": '/jadwal-panen/data',
+            "type": 'GET',
+        },
+        "columns": [{
+                "responsivePriority": 8,
+                "width": "10%",
+                "data": "bs_name",
+                "render": function(data, type, row) {
+                    if (type === 'display') {
+                        return '<p class="mb-0"><span class="badge badge-primary">' + row.bs_id + '</span></p>' +
+                            '<p class="mb-0"><span class="badge badge-success">' + data + '</span></p>';
+                    }
+                    return data;
+                }
+            },
+            {
+                "responsivePriority": 1,
+                "width": "5%",
+                "data": "resp_name",
+                "render": function(data, type, row) {
+                    if (type === 'display') {
+                        return '<strong>' + data + '</strong>' + '<br>' +
+                            row.resp_address;
+                    }
+                    return data;
+                }
+            },
+            {
+                "responsivePriority": 1,
+                "width": "5%",
+                "data": "commodity_name",
+            },
+            {
+                "responsivePriority": 1,
+                "width": "5%",
+                "data": "month_name",
+            },
+            {
+                "responsivePriority": 1,
+                "width": "5%",
+                "data": "sample_type_name",
+            },
+            {
+                "responsivePriority": 1,
+                "width": "5%",
+                "data": "user_name",
+            },
+            {
+                "responsivePriority": 1,
+                "width": "5%",
+                "data": "harvest_schedule",
+                "render": function(data, type, row) {
+                    if (type === 'display') {
+                        if (data == null) {
+                            return '<span class="badge badge-danger">Belum Diisi</span>';
+                        }
+                    }
+                    return data;
+                }
+            },
+            {
+                "responsivePriority": 1,
+                "width": "5%",
+                "data": "id",
+                "render": function(data, type, row) {
+                    return "<a href=\"/jadwal-panen/" + data + "/edit\" class=\"btn btn-outline-info  btn-sm\" role=\"button\" aria-pressed=\"true\" data-toggle=\"tooltip\" data-original-title=\"Ubah Data\">" +
+                        "<span class=\"btn-inner--icon\"><i class=\"fas fa-edit\"></i></span></a>" +
+                        "<form class=\"d-inline\" id=\"formdelete" + data + "\" name=\"formdelete" + data + "\" onsubmit=\"deleteSchedule('" + data + "','" + (row.bs_name + ' ' + row.resp_name) + "')\" method=\"POST\" action=\"/jadwal-panen/" + data + "\">" +
+                        '@method("delete")' +
+                        '@csrf' +
+                        "<button class=\"btn btn-icon btn-outline-danger btn-sm\" type=\"submit\" data-toggle=\"tooltip\" data-original-title=\"Hapus Data\">" +
+                        "<span class=\"btn-inner--icon\"><i class=\"fas fa-trash-alt\"></i></span></button></form>";
+                }
+            },
+        ],
+        "language": {
+            'paginate': {
+                'previous': '<i class="fas fa-angle-left"></i>',
+                'next': '<i class="fas fa-angle-right"></i>'
+            }
+        }
+    });
+
+    function getDataBySubround() {
+        var e = document.getElementById('subround');
+        var idsubround = e.options[e.selectedIndex].value;
+        table.ajax.url('/jadwal-panen/data/' + idsubround).load();
+    }
+</script>
+
+<script>
+    function deleteSchedule(id, name) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Yakin Hapus Jadwal Ini?',
+            text: name,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Tidak',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('formdelete' + id).submit();
+            }
+        })
+    }
+</script>
 
 @endsection
