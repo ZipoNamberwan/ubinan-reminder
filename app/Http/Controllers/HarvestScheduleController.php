@@ -47,6 +47,44 @@ class HarvestScheduleController extends Controller
 
         return view('admin.add-schedule', ['subdistricts' => $subdistricts, 'subdistricts' => $subdistricts, 'commodities' => $commodities, 'users' => $users, 'months' => $months, 'sampleTypes' => $sampleTypes]);
     }
+    public function storeHarvestSchedule(Request $request)
+    {
+        $this->validate($request, [
+            'subdistrict' => 'required',
+            'village' => 'required',
+            'bs' => 'required',
+            'name' => 'required',
+            'commodity' => 'required',
+            'sample-type' => 'required',
+            'month' => 'required',
+            'user' => 'required',
+            'address' => 'required',
+        ]);
+
+        MonthlySchedule::create([
+            'bs_id' => $request->bs,
+            'name' => $request->name,
+            'commodity_id' => $request->commodity,
+            'sample_type_id' => $request['sample-type'],
+            'month_id' => $request->month,
+            'year_id' => Year::firstWhere('name', date("Y"))->id,
+            'user_id' => $request->user,
+            'address' => $request->address,
+        ]);
+
+        return redirect('/jadwal-panen')->with('success-create', 'Jadwal Panen Bulanan telah ditambah!');
+    }
+    public function editHarvestSchedule($id)
+    {
+        $schedule = MonthlySchedule::find($id);
+        $subdistricts = Subdistrict::all();
+        $commodities = Commodity::all();
+        $users = User::all();
+        $months = Month::all();
+        $sampleTypes = SampleType::all();
+
+        return view('admin.edit-schedule', ['schedule' => $schedule, 'subdistricts' => $subdistricts, 'subdistricts' => $subdistricts, 'commodities' => $commodities, 'users' => $users, 'months' => $months, 'sampleTypes' => $sampleTypes]);
+    }
     public function getScheduleData(Request $request)
     {
         $year = Year::where(['name' => date('Y')])->first()->id;
@@ -126,7 +164,7 @@ class HarvestScheduleController extends Controller
             $entryData["commodity_name"] = $entry->commodity->name;
             $entryData["month_id"] = $entry->month->id;
             $entryData["month_name"] = $entry->month->name;
-            $entryData["bs_id"] = $entry->bs->fullcode();
+            $entryData["bs_id"] = $entry->bs->long_code;
             $entryData["bs_name"] = $entry->bs->fullname();
             $entryData["resp_name"] = ucfirst(strtolower($entry->name));
             $entryData["resp_address"] = ucfirst(strtolower($entry->address));

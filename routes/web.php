@@ -19,6 +19,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [MainController::class, 'dashboard']);
 Route::get('/jadwal-panen', [HarvestScheduleController::class, 'harvestSchedule']);
+Route::post('/jadwal-panen', [HarvestScheduleController::class, 'storeHarvestSchedule']);
+Route::put('/jadwal-panen/{id}', [HarvestScheduleController::class, 'updateHarvestSchedule']);
+Route::get('/jadwal-panen/{id}/edit', [HarvestScheduleController::class, 'editHarvestSchedule']);
 Route::get('/jadwal-panen/create', [HarvestScheduleController::class, 'createHarvestSchedule']);
 Route::delete('/jadwal-panen/{id}', [HarvestScheduleController::class, 'deleteHarvestSchedule']);
 Route::get('/jadwal-panen/data/{subround?}', [HarvestScheduleController::class, 'getScheduleData']);

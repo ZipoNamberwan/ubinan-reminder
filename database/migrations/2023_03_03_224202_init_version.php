@@ -20,13 +20,15 @@ return new class extends Migration
         });
         Schema::create('villages', function (Blueprint $table) {
             $table->id()->autoincrement();
-            $table->string('code')->unique();
+            $table->string('short_code');
+            $table->string('long_code')->unique();
             $table->string('name');
             $table->foreignId('subdistrict_id')->constrained('subdistricts');
         });
         Schema::create('bs', function (Blueprint $table) {
             $table->id()->autoincrement();
-            $table->string('code')->unique();
+            $table->string('short_code');
+            $table->string('long_code')->unique();
             $table->string('name');
             $table->foreignId('village_id')->constrained('villages');
         });
