@@ -137,7 +137,7 @@
                                     <select id="month" name="month" class="form-control" data-toggle="select" required>
                                         <option value="0" disabled selected> -- Pilih Bulan Panen -- </option>
                                         @foreach ($months as $month)
-                                        <option value="{{ $month->id }}" {{ old('month') == $month->id ? 'selected' : '' }}>
+                                        <option value="{{ $month->id }}" {{ old('month', $current_month) == $month->id ? 'selected' : '' }}>
                                             {{ $month->name }}
                                         </option>
                                         @endforeach
@@ -203,7 +203,7 @@
                 $('#village').empty();
                 $('#village').append(`<option value="0" disabled selected>Pilih Desa</option>`);
                 $('#bs').empty();
-                $('#bs').append(`<option value="0" disabled selected>Pilih bs</option>`);
+                $('#bs').append(`<option value="0" disabled selected>Pilih Blok Sensus</option>`);
                 response.forEach(element => {
                     if (selectedvillage == String(element.id)) {
                         $('#village').append('<option value=\"' + element.id + '\" selected>' +
@@ -231,10 +231,10 @@
                 response.forEach(element => {
                     if (selectedbs == String(element.id)) {
                         $('#bs').append('<option value=\"' + element.id + '\" selected>' +
-                            '[' + element.short_code + ']' + element.name + '</option>');
+                            element.name + '</option>');
                     } else {
-                        $('#bs').append('<option value=\"' + element.id + '\">' + '[' +
-                            element.short_code + '] ' + element.name + '</option>');
+                        $('#bs').append('<option value=\"' + element.id + '\">' +
+                            element.name + '</option>');
                     }
                 });
             }

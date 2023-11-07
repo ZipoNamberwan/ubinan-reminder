@@ -9,14 +9,14 @@ use App\Models\MonthlySchedule;
 use App\Models\SampleType;
 use App\Models\User;
 use App\Models\Year;
-use App\Rules\AreaRule;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 
-class MonthlyScheduleImport implements ToModel, WithHeadingRow, WithValidation, WithBatchInserts
+class MonthlyScheduleImport implements ToModel, WithHeadingRow, WithValidation, WithBatchInserts, SkipsEmptyRows
 {
 
     public $year;
@@ -34,15 +34,16 @@ class MonthlyScheduleImport implements ToModel, WithHeadingRow, WithValidation, 
      */
     public function model(array $row)
     {
+        dd($row);
         return new MonthlySchedule([
             'user_id' => User::where(['email' => $row['email_petugas']])->first()->id,
             'month_id' => Month::find(($this->subround - 1) * 4 + $row['panen'])->id,
             'year_id' => Year::find($this->year)->id,
-            'commodity_id' => Commodity::where(['name' => $row['komoditas']])->first()->id,
-            'bs_id' => Bs::where(['code' => ($row['kode_kec'] . $row['kode_desa'] . $row['nbs'])])->first()->id,
+            'commodity_id' => Commodity::where(['name' => ucfirst(strtolower($row['komoditas']))])->first()->id,
+            'bs_id' => Bs::where(['long_code' => ($row['kode_kec'] . $row['kode_desa'] . $row['nbs'])])->first()->id,
             'address' => $row['alamat'],
             'name' => $row['nama_krt'],
-            'sample_type_id' => SampleType::where(['name' => $row['jenis_sampel']])->first()->id,
+            'sample_type_id' => SampleType::where(['name' => ucfirst(strtolower($row['jenis_sampel']))])->first()->id,
         ]);
     }
 

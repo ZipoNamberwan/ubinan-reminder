@@ -44,8 +44,9 @@ class HarvestScheduleController extends Controller
         $users = User::all();
         $months = Month::all();
         $sampleTypes = SampleType::all();
+        $current_month = intval(date("m"));
 
-        return view('admin.add-schedule', ['subdistricts' => $subdistricts, 'subdistricts' => $subdistricts, 'commodities' => $commodities, 'users' => $users, 'months' => $months, 'sampleTypes' => $sampleTypes]);
+        return view('admin.add-schedule', ['current_month' => $current_month, 'subdistricts' => $subdistricts, 'subdistricts' => $subdistricts, 'commodities' => $commodities, 'users' => $users, 'months' => $months, 'sampleTypes' => $sampleTypes]);
     }
     public function storeHarvestSchedule(Request $request)
     {
@@ -85,6 +86,36 @@ class HarvestScheduleController extends Controller
 
         return view('admin.edit-schedule', ['schedule' => $schedule, 'subdistricts' => $subdistricts, 'subdistricts' => $subdistricts, 'commodities' => $commodities, 'users' => $users, 'months' => $months, 'sampleTypes' => $sampleTypes]);
     }
+
+    public function updateHarvestSchedule(Request $request, $id)
+    {
+        $this->validate($request, [
+            'subdistrict' => 'required',
+            'village' => 'required',
+            'bs' => 'required',
+            'name' => 'required',
+            'commodity' => 'required',
+            'sample-type' => 'required',
+            'month' => 'required',
+            'user' => 'required',
+            'address' => 'required',
+        ]);
+
+        $schedule = MonthlySchedule::find($id);
+        $schedule->update([
+            'bs_id' => $request->bs,
+            'name' => $request->name,
+            'commodity_id' => $request->commodity,
+            'sample_type_id' => $request['sample-type'],
+            'month_id' => $request->month,
+            'year_id' => Year::firstWhere('name', date("Y"))->id,
+            'user_id' => $request->user,
+            'address' => $request->address,
+        ]);
+
+        return redirect('/jadwal-panen')->with('success-create', 'Jadwal Panen Bulanan telah diubah!');
+    }
+
     public function getScheduleData(Request $request)
     {
         $year = Year::where(['name' => date('Y')])->first()->id;
