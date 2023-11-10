@@ -25,6 +25,7 @@ Route::get('/jadwal-panen/{id}/edit', [HarvestScheduleController::class, 'editHa
 Route::get('/jadwal-panen/create', [HarvestScheduleController::class, 'createHarvestSchedule']);
 Route::delete('/jadwal-panen/{id}', [HarvestScheduleController::class, 'deleteHarvestSchedule']);
 Route::get('/jadwal-panen/data/{subround?}', [HarvestScheduleController::class, 'getScheduleData']);
+Route::post('/jadwal-panen/data', [HarvestScheduleController::class, 'downloadSchedule']);
 Route::get('/jadwal-panen/village/{id}', [HarvestScheduleController::class, 'getVillage']);
 Route::get('/jadwal-panen/bs/{id}', [HarvestScheduleController::class, 'getBs']);
 

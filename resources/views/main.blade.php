@@ -56,7 +56,7 @@
                 <div class="collapse navbar-collapse" id="sidenav-collapse-main">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link active" href="/">
+                            <a class="nav-link @if(url()->current() == url('/')) active @endif" href="/">
                                 <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                                     <i class="ni ni-chart-pie-35 text-primary text-sm opacity-10"></i>
                                 </div>
@@ -64,7 +64,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/jadwal-panen">
+                            <a class="nav-link @if(substr_count(url()->current(), 'jadwal-panen') == 1) active @endif" href="/jadwal-panen">
                                 <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                                     <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
                                 </div>
@@ -72,7 +72,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/reminder">
+                            <a class="nav-link @if(substr_count(url()->current(), 'reminder') == 1) active @endif" href="/reminder">
                                 <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                                     <i class="ni ni-credit-card text-success text-sm opacity-10"></i>
                                 </div>
@@ -80,7 +80,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/manual-reminder">
+                            <a class="nav-link @if(substr_count(url()->current(), 'manual-reminder') == 1) active @endif" href="/manual-reminder">
                                 <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                                     <i class="ni ni-notification-70 text-info text-sm opacity-10"></i>
                                 </div>
@@ -88,7 +88,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/upload">
+                            <a class="nav-link @if(substr_count(url()->current(), 'upload') == 1) active @endif" href="/upload">
                                 <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                                     <i class="ni ni-cloud-upload-96 text-danger text-sm opacity-10"></i>
                                 </div>
@@ -96,7 +96,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/manual-reminder">
+                            <a class="nav-link @if(substr_count(url()->current(), 'history') == 1) active @endif" href="/history">
                                 <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                                     <i class="ni ni-send text-warning text-sm opacity-10"></i>
                                 </div>
@@ -108,7 +108,7 @@
                     <h6 class="navbar-heading p-0 text-muted">Admin</h6>
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link" href="/petugas">
+                            <a class="nav-link @if(substr_count(url()->current(), 'petugas') == 1) active @endif" href="/petugas">
                                 <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                                     <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
                                 </div>
@@ -116,7 +116,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/pengaturan">
+                            <a class="nav-link @if(substr_count(url()->current(), 'pengaturan') == 1) active @endif" href="/pengaturan">
                                 <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                                     <i class="ni ni-settings-gear-65 text-warning text-sm opacity-10"></i>
                                 </div>

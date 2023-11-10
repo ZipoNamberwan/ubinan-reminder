@@ -195,7 +195,7 @@ class HarvestScheduleController extends Controller
             $entryData["commodity_name"] = $entry->commodity->name;
             $entryData["month_id"] = $entry->month->id;
             $entryData["month_name"] = $entry->month->name;
-            $entryData["bs_id"] = $entry->bs->long_code;
+            $entryData["bs_id"] = $entry->bs->fullcode();
             $entryData["bs_name"] = $entry->bs->fullname();
             $entryData["resp_name"] = ucfirst(strtolower($entry->name));
             $entryData["resp_address"] = ucfirst(strtolower($entry->address));
@@ -214,6 +214,31 @@ class HarvestScheduleController extends Controller
             "recordsFiltered" => $recordsFiltered,
             "data" => $scheduleArray
         ]);
+    }
+    public function downloadSchedule(Request $request)
+    {
+        $year = Year::where(['name' => date('Y')])->first()->id;
+        $subround = null;
+
+        if ($request->subroundhidden != null & ($request->subroundhidden == 1 | $request->subroundhidden == 2 | $request->subroundhidden == 3)) {
+            $subround = $request->subroundhidden;
+        } else {
+            $current_month = intval(date("m"));
+            $subround = (int) (floor(($current_month - 1) / 4) + 1);
+        }
+
+        $max = $subround * 4;
+        $min = $max - 3;
+        $months = range($min, $max);
+        $schedules = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->get();
+
+        $spreadsheet = new Spreadsheet();
+        $activeWorksheet = $spreadsheet->getActiveSheet();
+
+        $writer = new Xlsx($spreadsheet);
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="Subround-' . $subround . '.xlsx"');
+        $writer->save('php://output');
     }
     public function checkUpload(Request $request)
     {

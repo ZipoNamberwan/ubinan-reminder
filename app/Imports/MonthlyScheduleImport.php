@@ -9,14 +9,16 @@ use App\Models\MonthlySchedule;
 use App\Models\SampleType;
 use App\Models\User;
 use App\Models\Year;
+use Exception;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Maatwebsite\Excel\Concerns\WithValidation;
 
-class MonthlyScheduleImport implements ToModel, WithHeadingRow, WithValidation, WithBatchInserts, SkipsEmptyRows
+class MonthlyScheduleImport implements ToModel, WithHeadingRow, SkipsEmptyRows, WithBatchInserts, WithValidation, WithMultipleSheets
 {
 
     public $year;
@@ -34,7 +36,6 @@ class MonthlyScheduleImport implements ToModel, WithHeadingRow, WithValidation, 
      */
     public function model(array $row)
     {
-        dd($row);
         return new MonthlySchedule([
             'user_id' => User::where(['email' => $row['email_petugas']])->first()->id,
             'month_id' => Month::find(($this->subround - 1) * 4 + $row['panen'])->id,
@@ -112,5 +113,12 @@ class MonthlyScheduleImport implements ToModel, WithHeadingRow, WithValidation, 
     public function batchSize(): int
     {
         return 1000;
+    }
+
+    public function sheets(): array
+    {
+        return [
+            'Template' => $this,
+        ];
     }
 }

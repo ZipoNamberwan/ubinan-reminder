@@ -24,7 +24,7 @@ class Bs extends Model
     
     public function fullcode()
     {
-        return "3513" . $this->subdistrict->code . $this->village->code . $this->code;
+        return "3513" . $this->subdistrict->code . $this->village->short_code . $this->short_code;
     }
 
     public function fullname()

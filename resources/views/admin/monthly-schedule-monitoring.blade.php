@@ -67,13 +67,6 @@
                                     <span class="btn-inner--icon"><i class="fas fa-plus-circle"></i></span>
                                     <span class="btn-inner--text">Tambah Jadwal</span>
                                 </a>
-                                <form class="d-inline" method="POST" action="/jadwal-panen/download" data-toggle="tooltip" data-original-title="Unduh Jadwal Panen">
-                                    @csrf
-                                    <button class="btn btn-icon btn-outline-primary" type="submit">
-                                        <span class="btn-inner--icon"><i class="fas fa-download"></i></span>
-                                        <span class="btn-inner--text">Download</span>
-                                    </button>
-                                </form>
                             </div>
                         </div>
                     </div>
@@ -87,8 +80,18 @@
                                     <option value="{{$subround}}" @if($subround==$currentsubround) selected @endif>{{$subround}}</option>
                                     @endforeach
                                 </select>
-                                <button onclick="getDataBySubround()" class="btn btn-primary mt-3 d-inline" type="button">Tampilkan</button>
                             </div>
+                        </div>
+                        <div class="form-row">
+                            <button onclick="getDataBySubround()" class="btn btn-primary mt-3 d-inline" type="button">Tampilkan</button>
+                            <form id="downloadform" class="d-inline" method="POST" action="/jadwal-panen/data" data-toggle="tooltip" data-original-title="Unduh Jadwal Panen">
+                                @csrf
+                                <input type="hidden" name="subroundhidden" id="subroundhidden">
+                                <button onclick="downloadDataBySubround()" class="btn btn-icon btn-outline-primary mt-3" type="submit">
+                                    <span class="btn-inner--icon"><i class="fas fa-download"></i></span>
+                                    <span class="btn-inner--text">Download Data</span>
+                                </button>
+                            </form>
                         </div>
                     </div>
                     <div class="row">
@@ -220,6 +223,15 @@
         var e = document.getElementById('subround');
         var idsubround = e.options[e.selectedIndex].value;
         table.ajax.url('/jadwal-panen/data/' + idsubround).load();
+    }
+
+    function downloadDataBySubround() {
+        event.preventDefault();
+        var e = document.getElementById('subround');
+        var hidden = document.getElementById('subroundhidden');
+        var idsubround = e.options[e.selectedIndex].value;
+        hidden.value = idsubround;
+        document.getElementById('downloadform').submit();
     }
 </script>
 
