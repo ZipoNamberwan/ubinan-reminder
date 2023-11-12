@@ -185,22 +185,19 @@
 <script>
     $(document).ready(function() {
         $('#subdistrict').on('change', function() {
-            loadVillage('0');
+            loadVillage(null, null);
         });
         $('#village').on('change', function() {
-            loadbs('0');
+            loadBs(null, null);
         });
-        // village = '{{ old("village", $schedule->bs->subdistrict->id)}}'
-        // bs = '{{ old("bs", $schedule->bs->village->id)}}'
-        // document.getElementById('village').value = village
-        // document.getElementById('bs').value = bs
-
-        // loadVillage(village)
-        // loadbs(bs)
     });
 
-    function loadVillage(selectedvillage) {
+    function loadVillage(subdistrictid = null, selectedvillage = null) {
         let id = $('#subdistrict').val();
+        if (subdistrictid != null) {
+            id = subdistrictid;
+        }
+        console.log(id);
         $('#village').empty();
         $('#village').append(`<option value="0" disabled selected>Processing...</option>`);
         $.ajax({
@@ -215,7 +212,7 @@
                 response.forEach(element => {
                     if (selectedvillage == String(element.id)) {
                         $('#village').append('<option value=\"' + element.id + '\" selected>' +
-                            '[' + element.short_code + ']' + element.name + '</option>');
+                            '[' + element.short_code + '] ' + element.name + '</option>');
                     } else {
                         $('#village').append('<option value=\"' + element.id + '\">' + '[' +
                             element.short_code + '] ' + element.name + '</option>');
@@ -225,8 +222,11 @@
         });
     }
 
-    function loadbs(selectedbs) {
+    function loadBs(villageid = null, selectedbs = null) {
         let id = $('#village').val();
+        if (villageid != null) {
+            id = villageid;
+        }
         $('#bs').empty();
         $('#bs').append(`<option value="0" disabled selected>Processing...</option>`);
         $.ajax({
@@ -234,9 +234,6 @@
             url: '/jadwal-panen/bs/' + id,
             success: function(response) {
                 var response = JSON.parse(response);
-                console.log('/jadwal-panen/bs/' + id)
-                console.log(selectedbs)
-                console.log(response)
                 $('#bs').empty();
                 $('#bs').append(`<option value="0" disabled selected>Pilih Blok Sensus</option>`);
                 response.forEach(element => {
@@ -252,5 +249,17 @@
         });
     }
 </script>
+
+@if(@old("subdistrict", $schedule->bs->village->subdistrict->id))
+<script>
+    loadVillage('{{@old("subdistrict", $schedule->bs->village->subdistrict->id)}}', '{{@old("village", $schedule->bs->village->id)}}')
+</script>
+@endif
+
+@if(@old("village", $schedule->bs->village->id))
+<script>
+    loadBs('{{@old("village", $schedule->bs->village->id)}}', '{{@old("bs", $schedule->bs->id)}}')
+</script>
+@endif
 
 @endsection

@@ -184,15 +184,19 @@
 <script>
     $(document).ready(function() {
         $('#subdistrict').on('change', function() {
-            loadVillage('0');
+            loadVillage(null, null);
         });
         $('#village').on('change', function() {
-            loadbs('0');
+            loadBs(null, null);
         });
     });
 
-    function loadVillage(selectedvillage) {
+    function loadVillage(subdistrictid = null, selectedvillage = null) {
         let id = $('#subdistrict').val();
+        if (subdistrictid != null) {
+            id = subdistrictid;
+        }
+        console.log(id);
         $('#village').empty();
         $('#village').append(`<option value="0" disabled selected>Processing...</option>`);
         $.ajax({
@@ -207,7 +211,7 @@
                 response.forEach(element => {
                     if (selectedvillage == String(element.id)) {
                         $('#village').append('<option value=\"' + element.id + '\" selected>' +
-                            '[' + element.short_code + ']' + element.name + '</option>');
+                            '[' + element.short_code + '] ' + element.name + '</option>');
                     } else {
                         $('#village').append('<option value=\"' + element.id + '\">' + '[' +
                             element.short_code + '] ' + element.name + '</option>');
@@ -217,8 +221,11 @@
         });
     }
 
-    function loadbs(selectedbs) {
+    function loadBs(villageid = null, selectedbs = null) {
         let id = $('#village').val();
+        if (villageid != null) {
+            id = villageid;
+        }
         $('#bs').empty();
         $('#bs').append(`<option value="0" disabled selected>Processing...</option>`);
         $.ajax({
@@ -241,5 +248,17 @@
         });
     }
 </script>
+
+@if(@old("subdistrict"))
+<script>
+    loadVillage('{{@old("subdistrict")}}', '{{@old("village")}}')
+</script>
+@endif
+
+@if(@old("village"))
+<script>
+    loadBs('{{@old("village")}}', '{{@old("bs")}}')
+</script>
+@endif
 
 @endsection

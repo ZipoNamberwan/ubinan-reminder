@@ -83,7 +83,10 @@
                             </div>
                         </div>
                         <div class="form-row">
-                            <button onclick="getDataBySubround()" class="btn btn-primary mt-3 d-inline" type="button">Tampilkan</button>
+                            <button onclick="getDataBySubround()" class="btn btn-primary mt-3 d-inline" type="button">
+                                <span class="btn-inner--icon"><i class="fas fa-eye"></i></span>
+                                <span class="btn-inner--text">Tampilkan</span>
+                            </button>
                             <form id="downloadform" class="d-inline" method="POST" action="/jadwal-panen/data" data-toggle="tooltip" data-original-title="Unduh Jadwal Panen">
                                 @csrf
                                 <input type="hidden" name="subroundhidden" id="subroundhidden">
