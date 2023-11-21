@@ -54,16 +54,16 @@ class MasterSeeder extends Seeder
         Commodity::create(['name' => 'Kacang Hijau']);
         Commodity::create(['name' => 'Kacang Tanah']);
 
-        Role::create(['name' => 'supervisor']);
-        Role::create(['name' => 'member']);
-        Role::create(['name' => 'admin']);
+        Role::create(['name' => 'PML']);
+        Role::create(['name' => 'PPL']);
+        Role::create(['name' => 'Admin']);
 
         $admin = User::create([
-            'name' => 'admin',
+            'name' => 'Admin',
             'email' => 'admin@bps.go.id',
             'password' => bcrypt('123456')
         ]);
-        $admin->assignRole('admin');
+        $admin->assignRole('Admin');
 
         Profile::create([
             'phone_number' => '82236981385',
@@ -75,7 +75,7 @@ class MasterSeeder extends Seeder
             'email' => 'sp1@gmail.com',
             'password' => bcrypt('123456')
         ]);
-        $sp->assignRole('supervisor');
+        $sp->assignRole('PML');
 
         Profile::create([
             'phone_number' => '82236981385',
@@ -87,7 +87,7 @@ class MasterSeeder extends Seeder
             'email' => 'user1@gmail.com',
             'password' => bcrypt('123456')
         ]);
-        $user1->assignRole('member');
+        $user1->assignRole('PPL');
 
         Profile::create([
             'phone_number' => '82236981385',
@@ -100,7 +100,7 @@ class MasterSeeder extends Seeder
             'email' => 'user2@gmail.com',
             'password' => bcrypt('123456')
         ]);
-        $user2->assignRole('member');
+        $user2->assignRole('PPL');
 
         Profile::create([
             'phone_number' => '82236981385',
