@@ -79,14 +79,14 @@
                                 <span class="nav-link-text ms-1">Monitoring Reminder</span>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a class="nav-link @if(substr_count(url()->current(), 'manual-reminder') == 1) active @endif" href="/manual-reminder">
                                 <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                                     <i class="ni ni-notification-70 text-info text-sm opacity-10"></i>
                                 </div>
                                 <span class="nav-link-text ms-1">Reminder Manual</span>
                             </a>
-                        </li>
+                        </li> -->
                         <li class="nav-item">
                             <a class="nav-link @if(substr_count(url()->current(), 'upload') == 1) active @endif" href="/upload">
                                 <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -96,7 +96,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link @if(substr_count(url()->current(), 'history') == 1) active @endif" href="/history">
+                            <a class="nav-link @if(substr_count(url()->current(), 'sent-messages') == 1) active @endif" href="/sent-messages">
                                 <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                                     <i class="ni ni-send text-warning text-sm opacity-10"></i>
                                 </div>

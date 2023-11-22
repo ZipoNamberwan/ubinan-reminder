@@ -112,6 +112,14 @@ return new class extends Migration
             $table->string('harvest_reminder_first_before_date');
             $table->string('harvest_reminder_second_before_date');
         });
+
+        Schema::create('sent_messages', function (Blueprint $table) {
+            $table->id();
+            $table->string('phone_number');
+            $table->string('receiver');
+            $table->string('message');
+            $table->timestamps();
+        });
     }
 
     /**

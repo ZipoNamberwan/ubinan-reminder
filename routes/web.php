@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\HarvestScheduleController;
 use App\Http\Controllers\MainController;
+use App\Http\Controllers\SentMessageController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -46,5 +47,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/manual-reminder', [MainController::class, 'manualReminder']);
         Route::get('/petugas', [UserController::class, 'index']);
         Route::get('/pengaturan', [MainController::class, 'settings']);
+
+        Route::get('/sent-messages/data', [SentMessageController::class, 'getData']);
+        Route::get('/sent-messages', [SentMessageController::class, 'index']);
     });
 });

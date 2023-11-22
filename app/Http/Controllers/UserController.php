@@ -143,7 +143,7 @@ class UserController extends Controller
     public function getData(Request $request)
     {
         $recordsTotal = User::all()->count();
-        $orderColumn = 'id_bs';
+        $orderColumn = 'name';
         $orderDir = 'desc';
         if ($request->order != null) {
             if ($request->order[0]['dir'] == 'asc') {
