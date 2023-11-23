@@ -1680,7 +1680,8 @@ pre code {
     margin-bottom: 1rem;
     color: #525f7f;
     background-color: transparent;
-    table-layout: fixed;
+    /* table-layout: fixed; */
+    /* wrap table di sini cari di sini*/
 }
 
 .table th,
@@ -21365,6 +21366,8 @@ textarea[resize='horizontal'] {
 .table th {
     font-size: .8125rem;
     word-wrap: break-word;
+    /* white-space: nowrap !important; */
+    /* wrap table di sini cari di sini*/
 }
 
 .table.align-items-center td,

@@ -43,8 +43,13 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function profile()
+    public function getPML()
     {
-        return $this->hasOne(Profile::class);
+        return $this->belongsTo(User::class, 'supervisor_id');
+    }
+
+    public function getPPLs()
+    {
+        return $this->hasMany(User::class, 'supervisor_id', 'id');
     }
 }

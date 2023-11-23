@@ -55,6 +55,7 @@
                 <!-- Collapse -->
                 <div class="collapse navbar-collapse" id="sidenav-collapse-main">
                     <ul class="navbar-nav">
+                        @hasrole('Admin')
                         <li class="nav-item">
                             <a class="nav-link @if(url()->current() == url('/')) active @endif" href="/">
                                 <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -63,6 +64,8 @@
                                 <span class="nav-link-text ms-1">Dashboard</span>
                             </a>
                         </li>
+                        @endhasrole
+                        @hasanyrole('Admin|PML')
                         <li class="nav-item">
                             <a class="nav-link @if(substr_count(url()->current(), 'jadwal-panen') == 1) active @endif" href="/jadwal-panen">
                                 <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -71,6 +74,8 @@
                                 <span class="nav-link-text ms-1">Monitoring Jadwal Panen</span>
                             </a>
                         </li>
+                        @endhasrole
+                        <!-- @hasrole('Admin|PML')
                         <li class="nav-item">
                             <a class="nav-link @if(substr_count(url()->current(), 'reminder') == 1) active @endif" href="/reminder">
                                 <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -79,6 +84,7 @@
                                 <span class="nav-link-text ms-1">Monitoring Reminder</span>
                             </a>
                         </li>
+                        @endhasrole -->
                         <!-- <li class="nav-item">
                             <a class="nav-link @if(substr_count(url()->current(), 'manual-reminder') == 1) active @endif" href="/manual-reminder">
                                 <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -87,6 +93,7 @@
                                 <span class="nav-link-text ms-1">Reminder Manual</span>
                             </a>
                         </li> -->
+                        @hasrole('Admin')
                         <li class="nav-item">
                             <a class="nav-link @if(substr_count(url()->current(), 'upload') == 1) active @endif" href="/upload">
                                 <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -95,6 +102,8 @@
                                 <span class="nav-link-text ms-1">Upload Jadwal Ubinan</span>
                             </a>
                         </li>
+                        @endhasrole()
+                        @hasrole('Admin|PML')
                         <li class="nav-item">
                             <a class="nav-link @if(substr_count(url()->current(), 'sent-messages') == 1) active @endif" href="/sent-messages">
                                 <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -103,7 +112,9 @@
                                 <span class="nav-link-text ms-1">History Pesan Terkirim</span>
                             </a>
                         </li>
+                        @endhasrole()
                     </ul>
+                    @hasrole('Admin')
                     <hr class="my-3">
                     <h6 class="navbar-heading p-0 text-muted">Admin</h6>
                     <ul class="navbar-nav">
@@ -124,6 +135,7 @@
                             </a>
                         </li>
                     </ul>
+                    @endhasrole()
                 </div>
             </div>
         </div>

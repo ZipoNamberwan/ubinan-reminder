@@ -48,6 +48,7 @@ class MasterSeeder extends Seeder
         Year::create(['name' => '2023']);
         Year::create(['name' => '2024']);
 
+        Commodity::create(['name' => 'Padi']);
         Commodity::create(['name' => 'Jagung']);
         Commodity::create(['name' => 'Ubi Kayu']);
         Commodity::create(['name' => 'Ubi Jalar']);
@@ -61,52 +62,62 @@ class MasterSeeder extends Seeder
         $admin = User::create([
             'name' => 'Admin',
             'email' => 'admin@bps.go.id',
-            'password' => bcrypt('123456')
+            'password' => bcrypt('123456'),
+            'phone_number' => '82236981385',
         ]);
         $admin->assignRole('Admin');
-
-        Profile::create([
-            'phone_number' => '82236981385',
-            'user_id' => $admin->id
-        ]);
 
         $sp = User::create([
             'name' => 'supervisor1',
             'email' => 'sp1@gmail.com',
-            'password' => bcrypt('123456')
+            'password' => bcrypt('123456'),
+            'phone_number' => '82236981385',
         ]);
         $sp->assignRole('PML');
-
-        Profile::create([
-            'phone_number' => '82236981385',
-            'user_id' => $sp->id
-        ]);
 
         $user1 = User::create([
             'name' => 'user1',
             'email' => 'user1@gmail.com',
-            'password' => bcrypt('123456')
-        ]);
-        $user1->assignRole('PPL');
-
-        Profile::create([
+            'password' => bcrypt('123456'),
             'phone_number' => '82236981385',
-            'user_id' => $user1->id,
             'supervisor_id' => $sp->id
         ]);
+        $user1->assignRole('PPL');
 
         $user2 = User::create([
             'name' => 'user2',
             'email' => 'user2@gmail.com',
-            'password' => bcrypt('123456')
+            'password' => bcrypt('123456'),
+            'phone_number' => '82236981385',
+            'supervisor_id' => $sp->id
         ]);
         $user2->assignRole('PPL');
 
-        Profile::create([
+        $sp = User::create([
+            'name' => 'supervisor1',
+            'email' => 'sp2@gmail.com',
+            'password' => bcrypt('123456'),
             'phone_number' => '82236981385',
-            'user_id' => $user2->id,
+        ]);
+        $sp->assignRole('PML');
+
+        $user3 = User::create([
+            'name' => 'user3',
+            'email' => 'user3@gmail.com',
+            'password' => bcrypt('123456'),
+            'phone_number' => '82236981385',
             'supervisor_id' => $sp->id
         ]);
+        $user3->assignRole('PPL');
+
+        $user4 = User::create([
+            'name' => 'user4',
+            'email' => 'user4@gmail.com',
+            'password' => bcrypt('123456'),
+            'phone_number' => '82236981385',
+            'supervisor_id' => $sp->id
+        ]);
+        $user4->assignRole('PPL');
 
         $Sukapura =  Subdistrict::create(
             ['name' => 'Sukapura', 'code' => '010']

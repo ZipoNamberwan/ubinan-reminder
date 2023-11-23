@@ -14,12 +14,14 @@ use App\Models\User;
 use App\Models\Village;
 use App\Models\Year;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 
 class HarvestScheduleController extends Controller
 {
@@ -41,7 +43,7 @@ class HarvestScheduleController extends Controller
     {
         $subdistricts = Subdistrict::all();
         $commodities = Commodity::all();
-        $users = User::all();
+        $users = User::role('PPL')->get();
         $months = Month::all();
         $sampleTypes = SampleType::all();
         $current_month = intval(date("m"));
@@ -55,6 +57,8 @@ class HarvestScheduleController extends Controller
             'village' => 'required',
             'bs' => 'required',
             'name' => 'required',
+            'nks' => 'required',
+            'sample_number' => 'required',
             'commodity' => 'required',
             'sample-type' => 'required',
             'month' => 'required',
@@ -65,6 +69,8 @@ class HarvestScheduleController extends Controller
         MonthlySchedule::create([
             'bs_id' => $request->bs,
             'name' => $request->name,
+            'nks' => $request->nks,
+            'sample_number' => $request->sample_number,
             'commodity_id' => $request->commodity,
             'sample_type_id' => $request['sample-type'],
             'month_id' => $request->month,
@@ -80,7 +86,7 @@ class HarvestScheduleController extends Controller
         $schedule = MonthlySchedule::find($id);
         $subdistricts = Subdistrict::all();
         $commodities = Commodity::all();
-        $users = User::all();
+        $users = User::role('PPL')->get();
         $months = Month::all();
         $sampleTypes = SampleType::all();
 
@@ -94,6 +100,8 @@ class HarvestScheduleController extends Controller
             'village' => 'required',
             'bs' => 'required',
             'name' => 'required',
+            'nks' => 'required',
+            'sample_number' => 'required',
             'commodity' => 'required',
             'sample-type' => 'required',
             'month' => 'required',
@@ -105,6 +113,8 @@ class HarvestScheduleController extends Controller
         $schedule->update([
             'bs_id' => $request->bs,
             'name' => $request->name,
+            'nks' => $request->nks,
+            'sample_number' => $request->sample_number,
             'commodity_id' => $request->commodity,
             'sample_type_id' => $request['sample-type'],
             'month_id' => $request->month,
@@ -118,6 +128,10 @@ class HarvestScheduleController extends Controller
 
     public function getScheduleData(Request $request)
     {
+        if (Auth::user() == null) {
+            abort(403);
+        }
+        $user = User::find(Auth::user()->id);
         $year = Year::where(['name' => date('Y')])->first()->id;
         $subround = null;
 
@@ -133,6 +147,12 @@ class HarvestScheduleController extends Controller
         $months = range($min, $max);
 
         $recordsTotal = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->count();
+        if ($user->hasRole('PML')) {
+            $recordsTotal = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->whereIn('user_id', $user->getPPLs->pluck('id'))->count();
+        } else if ($user->hasRole('PPL')) {
+            $recordsTotal = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->where('user_id', $user->id)->count();
+        }
+
         $orderColumn = 'id_bs';
         $orderDir = 'desc';
         if ($request->order != null) {
@@ -156,6 +176,12 @@ class HarvestScheduleController extends Controller
 
         $searchkeyword = $request->search['value'];
         $schedule = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->get();
+        if ($user->hasRole('PML')) {
+            $schedule = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->whereIn('user_id', $user->getPPLs->pluck('id'))->get();
+        } else if ($user->hasRole('PPL')) {
+            $schedule = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->where('user_id', $user->id)->get();
+        }
+
         if ($searchkeyword != null) {
             $schedule = $schedule->filter(function ($q) use (
                 $searchkeyword
@@ -185,26 +211,28 @@ class HarvestScheduleController extends Controller
 
         $scheduleArray = array();
         $i = $request->start + 1;
-        foreach ($schedule as $entry) {
-            $entryData = array();
-            $entryData["index"] = $i;
-            $entryData["id"] = $entry->id;
-            $entryData["user_id"] = $entry->user->id;
-            $entryData["user_name"] = $entry->user->name;
-            $entryData["commodity_id"] = $entry->commodity->id;
-            $entryData["commodity_name"] = $entry->commodity->name;
-            $entryData["month_id"] = $entry->month->id;
-            $entryData["month_name"] = $entry->month->name;
-            $entryData["bs_id"] = $entry->bs->fullcode();
-            $entryData["bs_name"] = $entry->bs->fullname();
-            $entryData["resp_name"] = ucfirst(strtolower($entry->name));
-            $entryData["resp_address"] = ucfirst(strtolower($entry->address));
-            $entryData["sample_type_id"] = $entry->sampleType->id;
-            $entryData["sample_type_name"] = $entry->sampleType->name;
-            $entryData["user_id"] = $entry->user->id;
-            $entryData["user_name"] = $entry->user->name;
-            $entryData["harvest_schedule"] = $entry->harvestSchedule != null ? $entry->harvestSchedule->date : null;
-            $scheduleArray[] = $entryData;
+        foreach ($schedule as $sch) {
+            $schData = array();
+            $schData["index"] = $i;
+            $schData["id"] = $sch->id;
+            $schData["user_id"] = $sch->user->id;
+            $schData["user_name"] = $sch->user->name;
+            $schData["commodity_id"] = $sch->commodity->id;
+            $schData["commodity_name"] = $sch->commodity->name;
+            $schData["month_id"] = $sch->month->id;
+            $schData["month_name"] = $sch->month->name;
+            $schData["bs_id"] = $sch->bs->fullcode();
+            $schData["bs_name"] = $sch->bs->fullname();
+            $schData["resp_name"] = ucfirst(strtolower($sch->name));
+            $schData["resp_address"] = ucfirst(strtolower($sch->address));
+            $schData["nks"] = $sch->nks;
+            $schData["sample_number"] = $sch->sample_number;
+            $schData["sample_type_id"] = $sch->sampleType->id;
+            $schData["sample_type_name"] = $sch->sampleType->name;
+            $schData["harvest_schedule"] = $sch->harvestSchedule != null ? $sch->harvestSchedule->date : null;
+            $schData["harvest_schedule_reminder_num"] = $sch->harvestSchedule != null ? $sch->harvestSchedule->reminder_num : null;
+            $schData["monthly_schedule_reminder_num"] = $sch->reminder_num;
+            $scheduleArray[] = $schData;
             $i++;
         }
         // dd($scheduleArray);
@@ -230,10 +258,53 @@ class HarvestScheduleController extends Controller
         $max = $subround * 4;
         $min = $max - 3;
         $months = range($min, $max);
+        $user = User::find(Auth::user()->id);
         $schedules = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->get();
+        if ($user->hasRole('PML')) {
+            $schedules = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->whereIn('user_id', $user->getPPLs->pluck('id'))->get();
+        } else if ($user->hasRole('PPL')) {
+            $schedules = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->where('user_id', $user->id)->get();
+        }
 
         $spreadsheet = new Spreadsheet();
         $activeWorksheet = $spreadsheet->getActiveSheet();
+
+        $startrow = 1;
+        $activeWorksheet->setCellValue('A' . $startrow, 'Kode Kecamatan');
+        $activeWorksheet->setCellValue('B' . $startrow, 'Kode Desa');
+        $activeWorksheet->setCellValue('C' . $startrow, 'Blok Sensus');
+        $activeWorksheet->setCellValue('D' . $startrow, 'NKS');
+        $activeWorksheet->setCellValue('E' . $startrow, 'Nomor Sampel');
+        $activeWorksheet->setCellValue('F' . $startrow, 'Nama KRT');
+        $activeWorksheet->setCellValue('G' . $startrow, 'Alamat');
+        $activeWorksheet->setCellValue('H' . $startrow, 'Komoditas');
+        $activeWorksheet->setCellValue('I' . $startrow, 'Bulan Panen');
+        $activeWorksheet->setCellValue('J' . $startrow, 'Jumlah Reminder Bulan Panen Terkirim');
+        $activeWorksheet->setCellValue('K' . $startrow, 'Perkiraan Tanggal Panen');
+        $activeWorksheet->setCellValue('L' . $startrow, 'Jumlah Reminder Panen Terkirim');
+        $activeWorksheet->setCellValue('M' . $startrow, 'Jenis Sampel');
+        $activeWorksheet->setCellValue('N' . $startrow, 'Petugas');
+        $activeWorksheet->setCellValue('O' . $startrow, 'Email Petugas');
+        $startrow++;
+
+        foreach ($schedules as $schedule) {
+            $activeWorksheet->setCellValueExplicit('A' . $startrow, $schedule->bs->village->subdistrict->code, DataType::TYPE_STRING);
+            $activeWorksheet->setCellValueExplicit('B' . $startrow, $schedule->bs->village->short_code, DataType::TYPE_STRING);
+            $activeWorksheet->setCellValue('C' . $startrow, $schedule->bs->short_code);
+            $activeWorksheet->setCellValueExplicit('D' . $startrow, $schedule->nks, DataType::TYPE_STRING);
+            $activeWorksheet->setCellValue('E' . $startrow, $schedule->sample_number);
+            $activeWorksheet->setCellValue('F' . $startrow, $schedule->name);
+            $activeWorksheet->setCellValue('G' . $startrow, $schedule->address);
+            $activeWorksheet->setCellValue('H' . $startrow, $schedule->commodity->name);
+            $activeWorksheet->setCellValue('I' . $startrow, $schedule->month->name);
+            $activeWorksheet->setCellValue('J' . $startrow, $schedule->reminder_num);
+            $activeWorksheet->setCellValue('K' . $startrow, $schedule->harvestSchedule != null ? $schedule->harvestSchedule->date : null);
+            $activeWorksheet->setCellValue('L' . $startrow, $schedule->harvestSchedule != null ? $schedule->harvestSchedule->reminder_num : null);
+            $activeWorksheet->setCellValue('M' . $startrow, $schedule->sampleType->name);
+            $activeWorksheet->setCellValue('N' . $startrow, $schedule->user->name);
+            $activeWorksheet->setCellValue('O' . $startrow, $schedule->user->email);
+            $startrow++;
+        }
 
         $writer = new Xlsx($spreadsheet);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

@@ -82,6 +82,24 @@
                                 </div>
                             </div>
                             <div class="row">
+                            <div class="col-md-4 mt-3">
+                                    <label class="form-control-label" for="nks">NKS <span class="text-danger">*</span></label>
+                                    <input type="number" name="nks" class="form-control @error('nks') is-invalid @enderror" id="validationCustom03" value="{{ @old('nks', $schedule->nks) }}">
+                                    @error('nks')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                    @enderror
+                                </div>
+                                <div class="col-md-4 mt-3">
+                                    <label class="form-control-label" for="sample_number">Nomor Sampel <span class="text-danger">*</span></label>
+                                    <input type="number" name="sample_number" class="form-control @error('sample_number') is-invalid @enderror" id="validationCustom03" value="{{ @old('sample_number', $schedule->sample_number) }}">
+                                    @error('sample_number')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                    @enderror
+                                </div>
                                 <div class="col-md-4 mt-3">
                                     <label class="form-control-label" for="name">Nama Responden <span class="text-danger">*</span></label>
                                     <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" id="validationCustom03" value="{{ @old('name', $schedule->name) }}">
@@ -91,7 +109,7 @@
                                     </div>
                                     @enderror
                                 </div>
-                                <div class="col-md-6 mt-3">
+                                <div class="col-md-4 mt-3">
                                     <div class="form-group">
                                         <label class="form-control-label" for="address">Alamat <span class="text-danger">*</span></label>
                                         <textarea class="form-control" id="address" name="address" rows="4">{{old('address', $schedule->address)}}</textarea>

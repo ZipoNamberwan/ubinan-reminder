@@ -62,7 +62,9 @@ return new class extends Migration
             $table->foreignId('commodity_id')->constrained('commodities');
             $table->foreignId('bs_id')->constrained('bs');
             $table->text('address');
+            $table->string('sample_number');
             $table->string('name');
+            $table->string('nks');
             $table->foreignId('sample_type_id')->constrained('sample_types');
             $table->integer('reminder_num')->default(0);
             $table->timestamps();
@@ -85,25 +87,6 @@ return new class extends Migration
             $table->softDeletes();
         });
 
-        Schema::create('profiles', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('user_id')->unique();
-            $table->string('phone_number');
-
-            $table->foreign('user_id')
-                ->references('id')
-                ->on('users')
-                ->onDelete('cascade');
-
-            $table->unsignedBigInteger('supervisor_id')->nullable();
-            $table->foreign('supervisor_id')
-                ->references('id')
-                ->on('users')
-                ->onDelete('cascade');
-
-            $table->timestamps();
-        });
-
         Schema::create('period_settings', function (Blueprint $table) {
             $table->id();
             $table->string('monthly_reminder_before_date');
@@ -118,6 +101,7 @@ return new class extends Migration
             $table->string('phone_number');
             $table->string('receiver');
             $table->string('message');
+            $table->foreignId('receiver_id')->constrained('users');
             $table->timestamps();
         });
     }

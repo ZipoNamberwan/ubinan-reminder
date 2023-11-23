@@ -57,17 +57,19 @@
                 <div class="card">
                     <!-- Card header -->
                     <div class="card-header pb-0">
-                        <div class="row">
+                        <div class="row mb-3">
                             <div class="col-md-7">
                                 <h3>Monitoring Jadwal Panen</h3>
                                 <p class="text-sm"><span>Tabel berikut menampilkan Jadwal Panen Bulanan dan Tanggal Perkiraan Panen.</span></p>
                             </div>
+                            @hasrole('Admin')
                             <div class="col-md-5 text-right">
                                 <a href="{{url('/jadwal-panen/create')}}" class="btn btn-primary btn-round btn-icon" data-toggle="tooltip" data-original-title="Tambah Jadwal Panen">
                                     <span class="btn-inner--icon"><i class="fas fa-plus-circle"></i></span>
                                     <span class="btn-inner--text">Tambah Jadwal</span>
                                 </a>
                             </div>
+                            @endhasrole
                         </div>
                     </div>
                     <!-- Card body -->
@@ -107,12 +109,15 @@
                                             <!-- Identitas Sampel mencakup kode kec, kode desa, kode sls, nbs, nks, no sampel, nama krt dan alamat -->
                                             <th>Responden</th>
                                             <th>Komoditas</th>
-                                            <th>Bulan Panen</th>
                                             <th>Jenis Sampel</th>
                                             <th>Petugas</th>
+                                            <th>Bulan Panen</th>
+                                            <th>Reminder Bulan Panen Terkirim</th>
                                             <th>Tanggal Perkiraan Panen</th>
+                                            <th>Reminder Panen Terkirim</th>
+                                            @hasrole('Admin')
                                             <th>Aksi</th>
-                                            <!-- Aksi mencakup detail -->
+                                            @endhasrole
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -149,7 +154,8 @@
                 "render": function(data, type, row) {
                     if (type === 'display') {
                         return '<p class="mb-0"><span class="badge badge-primary">' + row.bs_id + '</span></p>' +
-                            '<p class="mb-0"><span class="badge badge-success">' + data + '</span></p>';
+                            '<p class="mb-0"><span class="badge badge-success">' + data + '</span></p>' +
+                            '<p class="mb-0"><span class="badge badge-warning">' + row.nks + '</span></p>';
                     }
                     return data;
                 }
@@ -161,6 +167,7 @@
                 "render": function(data, type, row) {
                     if (type === 'display') {
                         return '<strong>' + data + '</strong>' + '<br>' +
+                            'No Sampel: ' + row.sample_number + '<br/>' +
                             row.resp_address;
                     }
                     return data;
@@ -170,11 +177,12 @@
                 "responsivePriority": 1,
                 "width": "5%",
                 "data": "commodity_name",
-            },
-            {
-                "responsivePriority": 1,
-                "width": "5%",
-                "data": "month_name",
+                "render": function(data, type, row) {
+                    if (type === 'display') {
+                        return '<strong>' + data + '</strong>' + '<br>';
+                    }
+                    return data;
+                }
             },
             {
                 "responsivePriority": 1,
@@ -185,6 +193,16 @@
                 "responsivePriority": 1,
                 "width": "5%",
                 "data": "user_name",
+            },
+            {
+                "responsivePriority": 1,
+                "width": "5%",
+                "data": "month_name",
+            },
+            {
+                "responsivePriority": 1,
+                "width": "5%",
+                "data": "monthly_schedule_reminder_num",
             },
             {
                 "responsivePriority": 1,
@@ -202,6 +220,12 @@
             {
                 "responsivePriority": 1,
                 "width": "5%",
+                "data": "harvest_schedule_reminder_num",
+            },
+            @hasrole('Admin')
+            {
+                "responsivePriority": 1,
+                "width": "5%",
                 "data": "id",
                 "render": function(data, type, row) {
                     return "<a href=\"/jadwal-panen/" + data + "/edit\" class=\"btn btn-outline-info  btn-sm\" role=\"button\" aria-pressed=\"true\" data-toggle=\"tooltip\" data-original-title=\"Ubah Data\">" +
@@ -213,6 +237,7 @@
                         "<span class=\"btn-inner--icon\"><i class=\"fas fa-trash-alt\"></i></span></button></form>";
                 }
             },
+            @endhasrole
         ],
         "language": {
             'paginate': {

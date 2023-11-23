@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\SentMessages;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class SentMessageController extends Controller
@@ -20,7 +22,20 @@ class SentMessageController extends Controller
 
     public function getData(Request $request)
     {
+        if (Auth::user() == null) {
+            abort(403);
+        }
+
+        $user = User::find(Auth::user()->id);
+        if (!($user->hasRole('Admin') | $user->hasRole('PML'))) {
+            abort(403);
+        }
+
         $recordsTotal = SentMessages::all()->count();
+        if ($user->hasRole('PML')) {
+            $recordsTotal = SentMessages::whereIn('receiver_id', $user->getPPLs->pluck('id'))->count();
+        }
+
         $orderColumn = 'created_at';
         $orderDir = 'desc';
         if ($request->order != null) {
@@ -40,6 +55,10 @@ class SentMessageController extends Controller
 
         $searchkeyword = $request->search['value'];
         $messages = SentMessages::all();
+        if ($user->hasRole('PML')) {
+            $messages = SentMessages::whereIn('receiver_id', $user->getPPLs->pluck('id'))->get();
+        }
+
         if ($searchkeyword != null) {
             $messages = $messages->filter(function ($q) use (
                 $searchkeyword
@@ -71,7 +90,7 @@ class SentMessageController extends Controller
             $messageData["receiver"] = $message->receiver;
             $messageData["phone_number"] = '+62' . $message->phone_number;
             $messageData["message"] = $message->message;
-            $messageData["time"] = date_format($message->created_at, "d M Y H:i");
+            $messageData["time"] = $message->created_at != null ? date_format($message->created_at, "d M Y H:i") : null;
             $messagesArray[] = $messageData;
             $i++;
         }

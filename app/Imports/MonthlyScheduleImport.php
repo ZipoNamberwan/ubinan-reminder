@@ -44,6 +44,8 @@ class MonthlyScheduleImport implements ToModel, WithHeadingRow, SkipsEmptyRows, 
             'bs_id' => Bs::where(['long_code' => ($row['kode_kec'] . $row['kode_desa'] . $row['nbs'])])->first()->id,
             'address' => $row['alamat'],
             'name' => $row['nama_krt'],
+            'nks' => $row['nks'],
+            'sample_number' => $row['no_sample'],
             'sample_type_id' => SampleType::where(['name' => ucfirst(strtolower($row['jenis_sampel']))])->first()->id,
         ]);
     }

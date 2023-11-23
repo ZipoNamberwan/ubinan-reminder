@@ -20,6 +20,9 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            $table->string('phone_number');
+            $table->foreignId('supervisor_id')->nullable()->constrained('users');
+
             $table->timestamps();
         });
     }

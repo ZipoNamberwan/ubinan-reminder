@@ -40,7 +40,7 @@
                         <div class="row mb-3">
                             <div class="col-md-7">
                                 <h3>Reminder Terkirim</h3>
-                                <p>Berikut reminder yang seharusnya telah terkirim ke petugas</p>
+                                <p>Berikut reminder yang telah terkirim ke petugas</p>
                             </div>
                         </div>
                     </div>
