@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\HarvestScheduleController;
 use App\Http\Controllers\MainController;
+use App\Http\Controllers\PplController;
 use App\Http\Controllers\SentMessageController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
@@ -21,8 +22,15 @@ use Illuminate\Support\Facades\Route;
 Auth::routes();
 
 Route::middleware(['auth'])->group(function () {
+
+    Route::get('/', [MainController::class, 'index']);
+    Route::get('/home', [MainController::class, 'index']);
+
+    Route::group(['middleware' => ['role:PPL']], function () {
+        Route::get('/jadwal-ubinan', [PplController::class, 'index']);
+    });
+
     Route::group(['middleware' => ['role:Admin|PML']], function () {
-        Route::get('/', [HarvestScheduleController::class, 'harvestSchedule']);
         Route::get('/jadwal-panen', [HarvestScheduleController::class, 'harvestSchedule']);
         Route::get('/jadwal-panen/data/{subround?}', [HarvestScheduleController::class, 'getScheduleData']);
         Route::post('/jadwal-panen/data', [HarvestScheduleController::class, 'downloadSchedule']);
@@ -33,7 +41,6 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::group(['middleware' => ['role:Admin']], function () {
-        Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
         Route::get('/users/data', [UserController::class, 'getData']);
         Route::resource('users', UserController::class);
 
