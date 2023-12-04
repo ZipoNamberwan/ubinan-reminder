@@ -92,7 +92,6 @@ class HarvestScheduleController extends Controller
 
         return view('admin.edit-schedule', ['schedule' => $schedule, 'subdistricts' => $subdistricts, 'subdistricts' => $subdistricts, 'commodities' => $commodities, 'users' => $users, 'months' => $months, 'sampleTypes' => $sampleTypes]);
     }
-
     public function updateHarvestSchedule(Request $request, $id)
     {
         $this->validate($request, [
@@ -125,7 +124,6 @@ class HarvestScheduleController extends Controller
 
         return redirect('/jadwal-panen')->with('success-create', 'Jadwal Panen Bulanan telah diubah!');
     }
-
     public function getScheduleData(Request $request)
     {
         if (Auth::user() == null) {
@@ -521,5 +519,9 @@ class HarvestScheduleController extends Controller
 
         // Output the generated file to browser
         $writer->save('php://output');
+    }
+
+    function dashboard() {
+        return view('dashboard');
     }
 }

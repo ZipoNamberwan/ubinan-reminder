@@ -1,27 +1,133 @@
 @extends('main')
 
 @section('stylesheet')
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <link rel="stylesheet" href="/assets/vendor/select2/dist/css/select2.min.css">
 <link rel="stylesheet" href="/assets/vendor/datatables2/datatables.min.css" />
 <link rel="stylesheet" href="/assets/vendor/@fortawesome/fontawesome-free/css/fontawesome.min.css" />
-@endsection
-
-@section('breadcrumb')
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
-        <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="/">Home</a></li>
-        <li class="breadcrumb-item text-sm text-white active" aria-current="page">Dashboard</li>
-    </ol>
-    <h6 class="font-weight-bolder text-white mb-0">Dashboard</h6>
-</nav>
+<link rel="stylesheet" href="/assets/css/container.css">
+<link rel="stylesheet" href="/assets/css/text.css">
 @endsection
 
 @section('container')
-<!-- Page content -->
+<div class="header bg-success pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-7">
+                    <h6 class="h2 text-white d-inline-block mb-0">Default</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-lg-6 col-5 text-right">
+                    <a href="#" class="btn btn-sm btn-neutral">New</a>
+                    <a href="#" class="btn btn-sm btn-neutral">Filters</a>
+                </div>
+            </div>
+            <!-- Card stats -->
+            <div class="row">
+                <div class="col-xl-3 col-md-6">
+                    <div class="card card-stats">
+                        <!-- Card body -->
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Total traffic</h5>
+                                    <span class="h2 font-weight-bold mb-0">350,897</span>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
+                                        <i class="ni ni-active-40"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="mt-3 mb-0 text-sm">
+                                <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
+                                <span class="text-nowrap">Since last month</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="card card-stats">
+                        <!-- Card body -->
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="card-title text-uppercase text-muted mb-0">New users</h5>
+                                    <span class="h2 font-weight-bold mb-0">2,356</span>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon icon-shape bg-gradient-orange text-white rounded-circle shadow">
+                                        <i class="ni ni-chart-pie-35"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="mt-3 mb-0 text-sm">
+                                <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
+                                <span class="text-nowrap">Since last month</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="card card-stats">
+                        <!-- Card body -->
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Sales</h5>
+                                    <span class="h2 font-weight-bold mb-0">924</span>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon icon-shape bg-gradient-green text-white rounded-circle shadow">
+                                        <i class="ni ni-money-coins"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="mt-3 mb-0 text-sm">
+                                <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
+                                <span class="text-nowrap">Since last month</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="card card-stats">
+                        <!-- Card body -->
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Performance</h5>
+                                    <span class="h2 font-weight-bold mb-0">49,65%</span>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
+                                        <i class="ni ni-chart-bar-32"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="mt-3 mb-0 text-sm">
+                                <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
+                                <span class="text-nowrap">Since last month</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="container-fluid mt--6">
+
     @if (session('success-edit') || session('success-create'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <div class="alert alert-primary alert-dismissible fade show" role="alert">
         <span class="alert-icon"><i class="fas fa-check-circle"></i></span>
         <span class="alert-text"><strong>Sukses! </strong>{{ session('success-create') }} {{ session('success-edit') }}</span>
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -40,31 +146,22 @@
     </div>
     @endif
 
-    <!-- Table -->
     <div class="row">
         <div class="col">
-            <div class="card z-index-2 h-100">
-                <div class="card-header pb-0 pt-3 bg-transparent">
-                    <h4 class="text-capitalize">Dashboard</h4>
-                    <!-- <p class="text-sm mb-0">
-                        <i class="fa fa-arrow-up text-success"></i>
-                        <span class="font-weight-bold">4% more</span> in 2021
-                    </p> -->
-                </div>
-                <div class="card-body p-3">
-                    <div class="table-responsive py-4">
-                        <table class="table align-items-center mb-0" id="datatable-id" width="100%">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th>Nama</th>
-                                    <th>Jagung</th>
-                                    <th>Ubi Jalar</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+            <div class="card-wrapper">
+                <!-- Custom form validation -->
+                <div class="card">
+                    <!-- Card header -->
+                    <div class="card-header pb-0">
+                        <div class="row mb-3">
+                            <div class="col-md-7">
+                                <h3>Dashboard</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card body -->
+                    <div class="card-body">
+
                     </div>
                 </div>
             </div>
@@ -74,5 +171,10 @@
 @endsection
 
 @section('optionaljs')
+<script src="/assets/vendor/select2/dist/js/select2.min.js"></script>
+<script src="/assets/vendor/sweetalert2/dist/sweetalert2.js"></script>
+<script src="/assets/vendor/datatables2/datatables.min.js"></script>
+<script src="/assets/vendor/momentjs/moment-with-locales.js"></script>
+<script src="/assets/vendor/momentjs/moment-with-locales.js"></script>
 
 @endsection

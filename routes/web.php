@@ -28,6 +28,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::group(['middleware' => ['role:PPL']], function () {
         Route::get('/jadwal-ubinan', [PplController::class, 'index']);
+        Route::get('/perkiraan-jadwal-panen/{id}', [PplController::class, 'entryHarvestSchedule']);
+        Route::post('/perkiraan-jadwal-panen/{id}', [PplController::class, 'storeHarvestSchedule']);
     });
 
     Route::group(['middleware' => ['role:Admin|PML']], function () {
