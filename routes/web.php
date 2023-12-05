@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\HarvestScheduleController;
 use App\Http\Controllers\MainController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PplController;
 use App\Http\Controllers\SentMessageController;
 use App\Http\Controllers\UserController;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/message-today', [MessageController::class, 'index']);
 
 Auth::routes();
 

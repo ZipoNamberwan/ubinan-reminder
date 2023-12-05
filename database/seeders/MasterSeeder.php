@@ -12,6 +12,7 @@ use App\Models\Subdistrict;
 use App\Models\User;
 use App\Models\Village;
 use App\Models\Year;
+use App\Models\MonthlySchedule;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
@@ -4169,8 +4170,9 @@ class MasterSeeder extends Seeder
         Bs::create(['name' => '018B', 'short_code' => '018B', 'long_code' => '240013018B', 'village_id' => $desa240013->id]);
         Bs::create(['name' => '019B', 'short_code' => '019B', 'long_code' => '240013019B', 'village_id' => $desa240013->id]);
 
-
         SampleType::create(['name' => 'Utama']);
         SampleType::create(['name' => 'Cadangan']);
+
+        MonthlySchedule::factory()->count(500)->create();
     }
 }
