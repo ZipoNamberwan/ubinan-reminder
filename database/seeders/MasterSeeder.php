@@ -6,14 +6,13 @@ use App\Models\Bs;
 use App\Models\Commodity;
 use App\Models\Month;
 use App\Models\PeriodSetting;
-use App\Models\Profile;
 use App\Models\SampleType;
 use App\Models\Subdistrict;
 use App\Models\User;
 use App\Models\Village;
 use App\Models\Year;
 use App\Models\MonthlySchedule;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\HarvestSchedule;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 
@@ -4174,5 +4173,6 @@ class MasterSeeder extends Seeder
         SampleType::create(['name' => 'Cadangan']);
 
         MonthlySchedule::factory()->count(500)->create();
+        HarvestSchedule::factory()->count(250)->create();
     }
 }

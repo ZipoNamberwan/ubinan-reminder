@@ -26,19 +26,12 @@ class MonthlyScheduleFactory extends Factory
             'sample_number' => fake()->numberBetween(1, 20),
             'commodity_id' => fake()->numberBetween(1, 6),
             'sample_type_id' => 1,
-            'month_id' => fake()->numberBetween(1, 12),
-            'year_id' => fake()->numberBetween(1, 2),
+            // 'month_id' => fake()->numberBetween(1, 12),
+            // 'year_id' => fake()->numberBetween(1, 2),
+            'month_id' => 12,
+            'year_id' => 1,
             'user_id' => fake()->randomElement([3, 4, 6, 7]),
             'address' => fake()->name(),
         ];
-    }
-
-    public function configure(): static
-    {
-        return $this->afterMaking(function (MonthlySchedule $monthlySchedule) {
-            // ...
-        })->afterCreating(function (MonthlySchedule $monthlySchedule) {
-            return 'sdasdsad';
-        });
     }
 }
