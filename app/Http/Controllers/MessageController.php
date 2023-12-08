@@ -142,60 +142,52 @@ class MessageController extends Controller
             $mapGapDay[$gap] = ['date' => date("Y-m-d", strtotime("+" . $gap . " day", strtotime($today))), 'alias' => $alias];
         }
 
-        foreach ($schedules as $schedule) {
-            if ($schedule->harvestSchedule != null) {
-                foreach ($mapGapDay as $key => $map) {
-                    if ($map['date'] == $schedule->harvestSchedule->date) {
-                        $transformedData['harvest'][$schedule->user->getPML->id][$schedule->user->id][$key][] = $schedule;
+        if (count($schedules) > 0) {
+            foreach ($schedules as $schedule) {
+                if ($schedule->harvestSchedule != null) {
+                    foreach ($mapGapDay as $key => $map) {
+                        if ($map['date'] == $schedule->harvestSchedule->date) {
+                            $transformedData['harvest'][$schedule->user->getPML->id][$schedule->user->id][$key][] = $schedule;
+                        }
                     }
                 }
             }
-        }
 
-        foreach ($transformedData['harvest'] as $pmlId => $pplschedules) {
-            $pml = User::find($pmlId);
-            $pplmap = [];
-            foreach ($pplschedules as $pplId => $gap) {
-                $ppl = User::find($pplId);
-                $prefixppl = "Halo Ubinan Fighters BPS Kabupaten Probolinggo!!!\r\nSekedar mengingatkan kalau dalam waktu dekat ada panen untuk sampel ubinan berikut:\r\n\r\n";
-                $suffixppl = "Pastikan tidak terlewat ya…., siapkan juga alat ubinannya mulai dari sekarang serta terakhir jangan lupa berdoa…\r\nSemangat, Fighting….\r\nBonus kata-kata mutiara:";
-                $pplMessage = '';
-                foreach ($gap as $gapkey => $transformedSchedules) {
-                    $pplMessage = $pplMessage . strtoupper($gapDay[$gapkey]) . "\r\n";
-                    $samples = [];
-                    foreach ($transformedSchedules as $transformedSchedule) {
-                        $samples[] = "🚩" . $transformedSchedule->bs->fullname() . " " . $transformedSchedule->name . " (*" . $transformedSchedule->commodity->name . "*) ";
+            foreach ($transformedData['harvest'] as $pmlId => $pplschedules) {
+                $pml = User::find($pmlId);
+                $pplmap = [];
+                foreach ($pplschedules as $pplId => $gap) {
+                    $ppl = User::find($pplId);
+                    $prefixppl = "Halo *Ubinan Fighters* BPS Kabupaten Probolinggo🤩🤩!!!\r\nSekedar mengingatkan kalau dalam waktu dekat ada panen untuk sampel ubinan berikut:\r\n\r\n";
+                    $suffixppl = "Pastikan tidak terlewat ya…., siapkan juga alat ubinannya mulai dari sekarang serta terakhir jangan lupa berdoa…💪💪💪\r\nSemangat, Fighting….\r\nBonus kata-kata mutiara:";
+                    $pplMessage = '';
+                    foreach ($gap as $gapkey => $transformedSchedules) {
+                        $pplMessage = $pplMessage . strtoupper($gapDay[$gapkey]) . "\r\n";
+                        $samples = [];
+                        foreach ($transformedSchedules as $transformedSchedule) {
+                            $samples[] = "🚩" . $transformedSchedule->bs->fullname() . " " . $transformedSchedule->name . " (*" . $transformedSchedule->commodity->name . "*) ";
+                            $pplmap[$gapkey][] = "🚩" . $transformedSchedule->bs->fullname() . " " . $transformedSchedule->name . " (*" . $transformedSchedule->commodity->name . "*) -- " . "*" . $transformedSchedule->user->name . "*";
+                        }
+                        $pplMessage = $pplMessage . implode("\r\n", $samples);
+                        $pplMessage = $pplMessage . "\r\n\r\n";
                     }
-                    $pplMessage = $pplMessage . implode("\r\n", $samples);
-                    $pplMessage = $pplMessage . "\r\n\r\n";
+
+                    // $message[] = ["message" => $prefixppl . $pplMessage . $suffixppl, "phone_number" => "+62" . $ppl->phone_number];
                 }
+                $prefixpml = "Selamat Pagi *PML Ubinan Fighters…*🤩🤩🤩, \r\nMengingatkan kembali kalau dalam waktu dekat ada panen untuk sampel ubinan berikut:\r\n\r\n";
+                $pmlMessage = '';
+                foreach ($pplmap as $key => $array) {
+                    $pmlMessage = $pmlMessage . strtoupper($gapDay[$key]) . "\r\n";
+                    $pmlMessage = $pmlMessage . implode("\r\n", $array);
+                    $pmlMessage = $pmlMessage . "\r\n\r\n";
+                }
+                $suffixpml = "\r\nMohon untuk *mengingatkan* kembali PPL terkait jadwal panen tersebut agar tidak terlewat. Sampel selengkapnya dan perkiraan tanggal panen bisa diakses melalui link berikut➡️ \r\n\r\n" . url("/jadwal-ubinan?month=" . $month->id) .
+                    " \r\n\r\n*Semangat, Fighting*💪💪💪";
 
-                $message[] = ["message" => $prefixppl . $pplMessage . $suffixppl, "phone_number" => "+62" . $ppl->phone_number];
-                // $pplmap[] = ['name' => $ppl->name, 'total_sample' => count($schedules)];
+                $message[] = ["message" => $prefixpml . $pmlMessage . $suffixpml, "phone_number" => "+62" . $pml->phone_number];
             }
-            // $prefixpml = '';
-            // if ($selectedBreakpoint[1] == 'next') {
-            //     $prefixpml = "Selamat pagi, *PML Ubinan Fighters….!!!*🤩🤩🤩 \r\n\r\nBerikut adalah jumlah sampel ubinan bulan depan (*" . $month->name . "*) untuk PPL Anda 💪💪💪 \r\n \r\n";
-            // } else {
-            //     $prefixpml = "Selamat pagi, *PML Ubinan Fighters….!!!*🤩🤩🤩 \r\n\r\nBerikut adalah jumlah sampel ubinan bulan ini (*" . $month->name . "*) yang belum diinput tanggal perkiraan panennya oleh PPL 💪💪💪 \r\n \r\n";
-            // }
-            // $pmlMessage = '';
-            // foreach ($pplmap as $map) {
-            //     $pmlMessage = $pmlMessage . "🚩*" . $map['name'] . "* : *" . $map['total_sample'] . "* sampel" . "\r\n";
-            // }
-            // $suffixpml = "Mohon untuk mengingatkan kembali PPL untuk menginput perkiraan tanggal panen. Sampel selengkapnya dan perkiraan tanggal panen bisa diakses melalui link berikut➡️ \r\n\r\n" . url("/jadwal-ubinan?month=" . $month->id) . " \r\n\r\nNb: Pesan 💚 Khusus untuk: *" . $pml->name . "*";
-
-            // $message[] = ["message" => $prefixpml . $pmlMessage . $suffixpml, "phone_number" => "+62" . $pml->phone_number];
         }
 
         return [$message[0]];
     }
 }
-
-// Halo Ubinan Fighters BPS Kabupaten Probolinggo!!!
-// Sekedar mengingatkan kalua besok/3hari lagi ada panen untuk sampel ubinan berikut:
-// A
-// B
-// Pastikan kamu tidak terlewat ya…., siapkan juga alat ubinannya mulai dari sekarang serta terakhir jangan lupa berdoa…
-// Semangat, Fighting….
-// Bonus kata-kata mutiara:
