@@ -137,6 +137,7 @@
 <script src="/assets/vendor/select2/dist/js/select2.min.js"></script>
 <script src="/assets/vendor/sweetalert2/dist/sweetalert2.js"></script>
 <script src="/assets/vendor/datatables2/datatables.min.js"></script>
+<script src="/assets/vendor/momentjs/moment-with-locales.js"></script>
 
 <script>
     var table = $('#datatable-id').DataTable({
@@ -212,6 +213,10 @@
                     if (type === 'display') {
                         if (data == null) {
                             return '<span class="badge badge-danger">Belum Diisi</span>';
+                        } else {
+                            let localLocale = moment(data);
+                            localLocale.locale('id');
+                            return localLocale.format('LL')
                         }
                     }
                     return data;
@@ -222,8 +227,7 @@
                 "width": "5%",
                 "data": "harvest_schedule_reminder_num",
             },
-            @hasrole('Admin')
-            {
+            @hasrole('Admin') {
                 "responsivePriority": 1,
                 "width": "5%",
                 "data": "id",

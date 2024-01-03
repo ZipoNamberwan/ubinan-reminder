@@ -61,7 +61,7 @@
                                 </div>
                             </div>
                             <p class="mt-3 mb-0 text-sm">
-                                <span class="text-danger mr-2"><i class="ni ni-chart-pie-35"></i> @if($total_sample > 0) {{round(($total_sample-$total_sample_not_entry)/$total_sample*100, 0)}}% @endif</span>
+                                <span class="text-danger mr-2"><i class="ni ni-chart-pie-35"></i> @if($total_sample > 0) {{round(($total_sample-$total_sample_not_entry)/$total_sample*100, 0)}}% sudah terisi @endif</span>
                             </p>
                         </div>
                     </div>
@@ -143,6 +143,17 @@
                         </div>
                     </div>
                 </div>
+                @if (count($schedules) == 0)
+                <div class="card">
+                    <div class="card-body">
+                        <div class="alert alert-info alert-dismissible fade show" role="alert">
+                            <span class="alert-icon"><i class="fas fa-check-circle"></i></span>
+                            <span class="alert-text"><strong>Belum ada jadwal bulan ini</strong></span>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
                 @foreach($schedules as $schedule)
                 <div class="card">
                     <div class="card-body">

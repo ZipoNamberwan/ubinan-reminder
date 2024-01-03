@@ -84,7 +84,7 @@
         },
         "columns": [{
                 "responsivePriority": 8,
-                "width": "10%",
+                "width": "5%",
                 "data": "receiver",
                 "render": function(data, type, row) {
                     if (type === 'display') {
@@ -96,7 +96,7 @@
             },
             {
                 "responsivePriority": 1,
-                "width": "5%",
+                "width": "15%",
                 "data": "message",
             },
             {

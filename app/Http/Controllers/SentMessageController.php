@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\SentMessagesResource;
+use App\Models\HarvestSchedule;
+use App\Models\MonthlySchedule;
 use App\Models\SentMessages;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -25,25 +27,40 @@ class SentMessageController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'receiver'     => 'required',
-            'type'     => 'required',
-            'message'   => 'required',
-            'phone_number' => 'required'
+            'receiver' => 'required',
+            'type' => 'required',
+            'message' => 'required',
+            'phone_number' => 'required',
+            'role' => 'required',
+            'ids' => 'required'
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        //create post
-        $post = SentMessages::create([
+        $message = SentMessages::create([
             'receiver' => $request->receiver,
             'type' => $request->type,
             'message' => $request->message,
             'phone_number' => $request->phone_number,
         ]);
 
-        return new SentMessagesResource(true, 'Data Post Berhasil Ditambahkan!', $post);
+        if ($request->role == "PPL") {
+            if ($request->type == "monthly") {
+                foreach ($request->ids as $id) {
+                    $schedule = MonthlySchedule::find($id);
+                    $schedule->update(['reminder_num' => $schedule->reminder_num + 1]);
+                }
+            } else {
+                foreach ($request->ids as $id) {
+                    $schedule = HarvestSchedule::find($id);
+                    $schedule->update(['reminder_num' => $schedule->reminder_num + 1]);
+                }
+            }
+        }
+
+        return new SentMessagesResource(true, 'Data Post Berhasil Ditambahkan!', $message);
     }
 
     public function getData(Request $request)

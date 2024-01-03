@@ -60,7 +60,8 @@
                 <div class="header-body text-center mb-6">
                     <div class="row justify-content-center">
                         <div class="col-xl-5 col-lg-6 col-md-8 px-5">
-                            <h1 class="text-white">Backend Automatic Ubinan Reminder</h1>
+                            <img src="/assets/img/brand/blue.png" class="logologin">
+                            <h1 class="text-white">Backend Automatic Ubinan Reminder System</h1>
                         </div>
                     </div>
                 </div>

@@ -15,6 +15,13 @@ class SentMessagesResource extends JsonResource
 
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'receiver' => $request->receiver,
+            'type' => $request->type,
+            'message' => $request->message,
+            'phone_number' => $request->phone_number,
+            'role' => $request->role,
+            'ids' => $request->ids
+        ];
     }
 }
