@@ -96,7 +96,7 @@
                                                 +62
                                             </span>
                                         </div>
-                                        <input name="phone_number" type="number" class="form-control @error('phone_number') is-invalid @enderror" value="{{ @old('phone_number', $user->profile->phone_number) }}">
+                                        <input name="phone_number" type="number" class="form-control @error('phone_number') is-invalid @enderror" value="{{ @old('phone_number', $user->phone_number) }}">
                                     </div>
                                 </div>
                             </div>
@@ -115,7 +115,7 @@
                                     <select id="supervisor" name="supervisor" class="form-control" data-toggle="select" name="supervisor" required>
                                         <option value="0" disabled selected> -- Pilih Pengawas -- </option>
                                         @foreach ($supervisors as $supervisor)
-                                        <option value="{{ $supervisor->id }}" {{ old('supervisor', $user->hasRole('PPL') ? $user->profile->supervisor->id : null) == $supervisor->id ? 'selected' : '' }}>
+                                        <option value="{{ $supervisor->id }}" {{ old('supervisor', $user->hasRole('PPL') ? $user->getPML->id : null) == $supervisor->id ? 'selected' : '' }}>
                                             {{ $supervisor->name }}
                                         </option>
                                         @endforeach

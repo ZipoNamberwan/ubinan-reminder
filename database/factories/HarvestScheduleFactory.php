@@ -20,7 +20,7 @@ class HarvestScheduleFactory extends Factory
     public function definition()
     {
         return [
-            'date' => '2023-12-' . sprintf("%02d", fake()->numberBetween(1, 31)),
+            'date' => '2024-01-' . sprintf("%02d", fake()->numberBetween(1, 31)),
             // 'date' => '2023-12-' . sprintf("%02d", fake()->numberBetween(l2, 4)),            
             'respondent_name' => fake()->name(),
             'monthly_schedule_id' => fake()->unique()->numberBetween(1, 500),

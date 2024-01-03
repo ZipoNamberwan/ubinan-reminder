@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::get('/message-today', [MessageController::class, 'index']);
+Route::post('/sent-message', [SentMessageController::class, 'store']);
 
 Auth::routes();
 

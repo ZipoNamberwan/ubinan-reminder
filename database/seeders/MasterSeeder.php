@@ -13,6 +13,7 @@ use App\Models\Village;
 use App\Models\Year;
 use App\Models\MonthlySchedule;
 use App\Models\HarvestSchedule;
+use App\Models\Quote;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 
@@ -4174,5 +4175,20 @@ class MasterSeeder extends Seeder
 
         MonthlySchedule::factory()->count(500)->create();
         HarvestSchedule::factory()->count(250)->create();
+
+        Quote::create(['quote' => 'Kerja keraslah sampai tetangga berpikir rezekimu hasil dari pesugihan.']);
+        Quote::create(['quote' => 'Masalah bisa membuat kita semakin dewasa, maka sering-seringlah bermasalah.']);
+        Quote::create(['quote' => 'Sahabat super, jika ingin terlihat ganteng, bergaullah dengan orang jelek.']);
+        Quote::create(['quote' => 'Bekerjalah sampai rekening bankmu terlihat seperti nomor telepon.']);
+        Quote::create(['quote' => 'Sukses berawal dari mimpi. Oleh karena itu mari kita perbanyak tidur.']);
+        Quote::create(['quote' => 'Pengetahuan itu seperti pakaian dalam, jika memang kamu punya tak usah dipamerkan.']);
+        Quote::create(['quote' => 'Saat hidup menutup pintu untukmu, buka lagi saja. Itu hanya pintu, itulah cara kerjanya.']);
+        Quote::create(['quote' => 'Uang bukanlah hal terpenting di dunia, tapi cinta. Untungnya, aku cinta uang.']);
+        Quote::create(['quote' => 'Sabar memang sulit karena hadiahnya surga. Coba kalau gampang, paling hadiahnya payung.']);
+        Quote::create(['quote' => 'Manusia boleh berencana, tapi saldo juga yang menentukan.']);
+        Quote::create(['quote' => 'Contohlah tukang parkir. Meskipun punya banyak mobil, ia tak pernah sombong karena tahu itu semua hanya titipan.']);
+        Quote::create(['quote' => 'Seberat apa pun masalahmu, jangan ditimbang. Nggak bakalan laku']);
+        Quote::create(['quote' => 'Jangan meresapi sebuah kegagalan. Meres baju aja capeknya minta ampun, apalagi meres-sapi.']);
+        Quote::create(['quote' => 'Sekali mendayung, dua tiga hari pegelnya nggak ilang-ilang.']);
     }
 }

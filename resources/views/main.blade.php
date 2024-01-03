@@ -136,14 +136,14 @@
                                 <span class="nav-link-text ms-1">Petugas</span>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a class="nav-link @if(substr_count(url()->current(), 'pengaturan') == 1) active @endif" href="/pengaturan">
                                 <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                                     <i class="ni ni-settings-gear-65 text-warning text-sm opacity-10"></i>
                                 </div>
                                 <span class="nav-link-text ms-1">Pengaturan</span>
                             </a>
-                        </li>
+                        </li> -->
                     </ul>
                     @endhasrole()
                 </div>

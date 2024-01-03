@@ -28,8 +28,8 @@ class MonthlyScheduleFactory extends Factory
             'sample_type_id' => 1,
             // 'month_id' => fake()->numberBetween(1, 12),
             // 'year_id' => fake()->numberBetween(1, 2),
-            'month_id' => 12,
-            'year_id' => 1,
+            'month_id' => 1,
+            'year_id' => 2,
             'user_id' => fake()->randomElement([3, 4, 6, 7]),
             'address' => fake()->name(),
         ];

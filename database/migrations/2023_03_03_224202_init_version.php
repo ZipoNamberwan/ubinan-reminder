@@ -101,8 +101,13 @@ return new class extends Migration
             $table->string('phone_number');
             $table->string('receiver');
             $table->string('message');
-            $table->foreignId('receiver_id')->constrained('users');
+            $table->enum('type', ['monthly', 'harvest']);
             $table->timestamps();
+        });
+
+        Schema::create('quotes', function (Blueprint $table) {
+            $table->id();
+            $table->text('quote');
         });
     }
 

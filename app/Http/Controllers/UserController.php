@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -40,7 +39,7 @@ class UserController extends Controller
     {
         $this->validate($request, [
             'name' => 'required',
-            'email' => 'required',
+            'email' => 'required|email|unique:users,email',
             'role' => 'required',
             'phone_number' => 'required',
             'password' => 'required',
@@ -51,14 +50,10 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-        ]);
-        $user->assignRole($request->role);
-
-        Profile::create([
             'supervisor_id' => $request->role == 'PPL' ? $request->supervisor : null,
             'phone_number' => $request->phone_number,
-            'user_id' => $user->id,
         ]);
+        $user->assignRole($request->role);
 
         return redirect('/users')->with('success-create', 'Pengguna telah ditambah!');
     }
@@ -111,16 +106,11 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => $request->password != $user->password ?  bcrypt($request->password) : $user->password,
+            'supervisor_id' => $request->role == 'PPL' ? $request->supervisor : null,
+            'phone_number' => $request->phone_number,
         ]);
         $user->removeRole($user->roles[0]->name);
         $user->assignRole($request->role);
-
-        $profile = $user->profile;
-        $profile->update([
-            'supervisor_id' => $request->role == 'PPL' ? $request->supervisor : null,
-            'phone_number' => $request->phone_number,
-            'user_id' => $user->id,
-        ]);
 
         return redirect('/users')->with('success-create', 'Pengguna telah diubah!');
     }
@@ -192,10 +182,10 @@ class UserController extends Controller
             $userData["id"] = $user->id;
             $userData["name"] = $user->name;
             $userData["email"] = $user->email;
-            $userData["phone_number"] = '+62' . $user->profile->phone_number;
+            $userData["phone_number"] = '+62' . $user->phone_number;
             $userData["role"] = $user->roles->first()->name;
-            $userData["supervisor_id"] = $user->profile->supervisor != null ? $user->profile->supervisor->id : '';
-            $userData["supervisor_name"] = $user->profile->supervisor != null ? $user->profile->supervisor->name : '';
+            $userData["supervisor_id"] = $user->getPML != null ? $user->getPML->id : '';
+            $userData["supervisor_name"] = $user->getPML != null ? $user->getPML->name : '';
             $usersArray[] = $userData;
             $i++;
         }

@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\SentMessagesResource;
 use App\Models\SentMessages;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
 
 class SentMessageController extends Controller
 {
@@ -18,6 +20,30 @@ class SentMessageController extends Controller
     public function index()
     {
         return view('message/index');
+    }
+
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'receiver'     => 'required',
+            'type'     => 'required',
+            'message'   => 'required',
+            'phone_number' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        //create post
+        $post = SentMessages::create([
+            'receiver' => $request->receiver,
+            'type' => $request->type,
+            'message' => $request->message,
+            'phone_number' => $request->phone_number,
+        ]);
+
+        return new SentMessagesResource(true, 'Data Post Berhasil Ditambahkan!', $post);
     }
 
     public function getData(Request $request)
