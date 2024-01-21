@@ -55,10 +55,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/jadwal-panen/village/{id}', [HarvestScheduleController::class, 'getVillage']);
         Route::get('/jadwal-panen/bs/{id}', [HarvestScheduleController::class, 'getBs']);
 
-        Route::get('/upload', [HarvestScheduleController::class, 'showUploadForm']);
-        Route::post('/upload', [HarvestScheduleController::class, 'uploadSchedule']);
+        Route::get('/upload-palawija', [HarvestScheduleController::class, 'showUploadFormPalawija']);
+        Route::get('/upload-padi', [HarvestScheduleController::class, 'showUploadFormPadi']);
+        Route::post('/upload-palawija', [HarvestScheduleController::class, 'uploadSchedulePalawija']);
+        Route::post('/upload-padi', [HarvestScheduleController::class, 'uploadSchedulePadi']);
         Route::get('/check-upload/{year}/{subround}', [HarvestScheduleController::class, 'checkUpload']);
-        Route::post('/template', [HarvestScheduleController::class, 'generateTemplate']);
+        Route::post('/template-palawija', [HarvestScheduleController::class, 'generateTemplatePalawija']);
+        Route::post('/template-padi', [HarvestScheduleController::class, 'generateTemplatePadi']);
 
         Route::get('/manual-reminder', [MainController::class, 'manualReminder']);
         Route::get('/petugas', [UserController::class, 'index']);

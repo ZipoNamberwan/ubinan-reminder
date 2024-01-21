@@ -105,12 +105,26 @@
                         </li> -->
                         @hasrole('Admin')
                         <li class="nav-item">
-                            <a class="nav-link @if(substr_count(url()->current(), 'upload') == 1) active @endif" href="/upload">
+                            <a class="nav-link @if((substr_count(url()->current(), 'upload-palawija') == 1) || (substr_count(url()->current(), 'upload-padi') == 1)) active @endif" href="#navbar-components" data-toggle="collapse" role="button" aria-expanded="@if((substr_count(url()->current(), 'upload-palawija') == 1) || (substr_count(url()->current(), 'upload-padi') == 1)) true @else false @endif" aria-controls="navbar-components">
                                 <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                                     <i class="ni ni-cloud-upload-96 text-danger text-sm opacity-10"></i>
                                 </div>
-                                <span class="nav-link-text ms-1">Upload Jadwal Ubinan</span>
+                                <span class="nav-link-text">Upload Jadwal Ubinan</span>
                             </a>
+                            <div class="collapse @if((substr_count(url()->current(), 'upload-palawija') == 1) || (substr_count(url()->current(), 'upload-padi') == 1)) show @endif" id="navbar-components">
+                                <ul class="nav nav-sm flex-column">
+                                    <li class="nav-item">
+                                        <a class="nav-link @if(substr_count(url()->current(), 'upload-padi') == 1) active @endif" href="/upload-padi">
+                                            <span class="nav-link-text ms-1">Padi</span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link @if(substr_count(url()->current(), 'upload-palawija') == 1) active @endif" href="/upload-palawija">
+                                            <span class="nav-link-text ms-1">Palawija</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
                         @endhasrole()
                         @hasrole('Admin|PML')

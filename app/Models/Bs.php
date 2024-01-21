@@ -21,14 +21,22 @@ class Bs extends Model
     {
         return $this->village->subdistrict();
     }
-    
+
     public function fullcode()
     {
         return "3513" . $this->subdistrict->code . $this->village->short_code . $this->short_code;
+    }
+    public function fullcodesegment()
+    {
+        return "3513" . $this->subdistrict->code;
     }
 
     public function fullname()
     {
         return $this->subdistrict->name . ", " . $this->village->name . ", " . $this->name;
+    }
+    public function fullnamesegment()
+    {
+        return $this->subdistrict->name . ", " . $this->village->name;
     }
 }

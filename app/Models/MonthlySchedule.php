@@ -38,6 +38,10 @@ class MonthlySchedule extends Model
     {
         return $this->belongsTo(SampleType::class, 'sample_type_id');
     }
+    public function subSegment()
+    {
+        return $this->belongsTo(SubSegment::class, 'subsegment_id');
+    }
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

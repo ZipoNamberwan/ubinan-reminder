@@ -39,16 +39,16 @@ class UserController extends Controller
     {
         $this->validate($request, [
             'name' => 'required',
-            'email' => 'required|email|unique:users,email',
+            // 'email' => 'required|email|unique:users,email',
             'role' => 'required',
-            'phone_number' => 'required',
+            'phone_number' => 'required|unique:users,phone_number',
             'password' => 'required',
             'supervisor' => 'required_if:role,PPL'
         ]);
 
         $user = User::create([
             'name' => $request->name,
-            'email' => $request->email,
+            'email' => $request->phone_number,
             'password' => bcrypt($request->password),
             'supervisor_id' => $request->role == 'PPL' ? $request->supervisor : null,
             'phone_number' => $request->phone_number,
@@ -95,16 +95,16 @@ class UserController extends Controller
 
         $this->validate($request, [
             'name' => 'required',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            // 'email' => 'required|email|unique:users,email,' . $user->id,
             'role' => 'required',
-            'phone_number' => 'required',
+            'phone_number' => 'required|unique:users,phone_number',
             'password' => 'required',
             'supervisor' => 'required_if:role,PPL'
         ]);
 
         $user->update([
             'name' => $request->name,
-            'email' => $request->email,
+            'email' => $request->phone_number,
             'password' => $request->password != $user->password ?  bcrypt($request->password) : $user->password,
             'supervisor_id' => $request->role == 'PPL' ? $request->supervisor : null,
             'phone_number' => $request->phone_number,

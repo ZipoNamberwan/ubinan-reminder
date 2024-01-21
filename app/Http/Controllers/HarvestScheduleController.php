@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Utilities;
 use App\Imports\MonthlyScheduleImport;
+use App\Imports\MonthlyScheduleImportPadi;
 use App\Models\Bs;
 use App\Models\Commodity;
 use App\Models\Month;
@@ -219,11 +220,11 @@ class HarvestScheduleController extends Controller
             $schData["commodity_name"] = $sch->commodity->name;
             $schData["month_id"] = $sch->month->id;
             $schData["month_name"] = $sch->month->name;
-            $schData["bs_id"] = $sch->bs->fullcode();
-            $schData["bs_name"] = $sch->bs->fullname();
-            $schData["resp_name"] = ucfirst(strtolower($sch->name));
+            $schData["bs_id"] = $sch->commodity->id != 1 ? $sch->bs->fullcode() : $sch->bs->fullcodesegment() . sprintf('%02d', $sch->segment);
+            $schData["bs_name"] = $sch->commodity->id != 1 ? $sch->bs->fullname() : $sch->bs->fullnamesegment();
+            $schData["resp_name"] = $sch->commodity->id != 1 ? ucfirst(strtolower($sch->name)) : $sch->subSegment->code;
             $schData["resp_address"] = ucfirst(strtolower($sch->address));
-            $schData["nks"] = $sch->nks;
+            $schData["nks"] = $sch->commodity->id != 1 ? $sch->nks : $sch->subSegment->code;
             $schData["sample_number"] = $sch->sample_number;
             $schData["sample_type_id"] = $sch->sampleType->id;
             $schData["sample_type_name"] = $sch->sampleType->name;
@@ -315,7 +316,7 @@ class HarvestScheduleController extends Controller
         $min = $max - 3;
         $months = range($min, $max);
         $year = Year::find($request->year)->id;
-        $ms = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->get();
+        $ms = MonthlySchedule::where('commodity_id', '!=', 1)->where(['year_id' => $year])->whereIn('month_id', $months)->get();
 
         if (count($ms) > 0) {
             return ['is_data_exist' => true];
@@ -323,7 +324,7 @@ class HarvestScheduleController extends Controller
             return ['is_data_exist' => false];
         }
     }
-    public function showUploadForm()
+    public function showUploadFormPalawija()
     {
         $years = Year::all();
         $currentyear = Year::firstWhere('name', date("Y"));
@@ -336,7 +337,21 @@ class HarvestScheduleController extends Controller
 
         return view('admin.upload', ['years' => $years, 'currentyear' => $currentyear, 'subrounds' => $subrounds]);
     }
-    public function uploadSchedule(Request $request)
+
+    public function showUploadFormPadi()
+    {
+        $years = Year::all();
+        $currentyear = Year::firstWhere('name', date("Y"));
+
+        if ($currentyear == null) {
+            $currentyear = Year::all()->last();
+        }
+
+        $subrounds = [1, 2, 3];
+
+        return view('admin.upload-padi', ['years' => $years, 'currentyear' => $currentyear, 'subrounds' => $subrounds]);
+    }
+    public function uploadSchedulePalawija(Request $request)
     {
         $rules = [
             'file' => 'required',
@@ -354,13 +369,56 @@ class HarvestScheduleController extends Controller
             $min = $max - 3;
             $months = range($min, $max);
             $year = Year::find($request->year)->id;
-            $ms = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->get();
+            $ms = MonthlySchedule::where('commodity_id', '!=', 1)->where(['year_id' => $year])->whereIn('month_id', $months)->get();
 
             Excel::import(new MonthlyScheduleImport($request->year, $request->subround), $request->file('file'));
 
             MonthlySchedule::destroy($ms->pluck('id'));
 
-            return redirect('/upload')->with('success-create', 'Data Jadwal Ubinan Bulanan telah disimpan!');
+            return redirect('/upload-palawija')->with('success-create', 'Data Jadwal Ubinan Bulanan telah disimpan!');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $formattedFailures = [];
+            $failures = $e->failures();
+            foreach ($failures as $failure) {
+                $failure->row();
+                $failure->attribute();
+                $failure->errors();
+                $failure->values();
+                if (!array_key_exists($failure->row(), $formattedFailures)) {
+                    $row = [$failure->attribute()];
+                    $formattedFailures[$failure->row()] = $row;
+                } else {
+                    $formattedFailures[$failure->row()][] = $failure->attribute();
+                }
+            }
+
+            ksort($formattedFailures);
+
+            $failures = [];
+            foreach ($formattedFailures as $key => $value) {
+                $failures[$key] = Utilities::getSentenceFromArray($value);
+            }
+
+            return view('admin.failed-upload', ['failures' => $failures]);
+        }
+    }
+    public function uploadSchedulePadi(Request $request)
+    {
+        $rules = [
+            'file' => 'required',
+            'year' => 'required',
+            // 'subround' => 'required',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        try {
+            Excel::import(new MonthlyScheduleImportPadi($request->year, $request->subround), $request->file('file'));
+
+            return redirect('/upload-padi')->with('success-create', 'Data Jadwal Ubinan Bulanan telah disimpan!');
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             $formattedFailures = [];
             $failures = $e->failures();
@@ -395,7 +453,7 @@ class HarvestScheduleController extends Controller
     {
         return json_encode(Bs::where('village_id', $id)->get());
     }
-    public function generateTemplate()
+    public function generateTemplatePalawija()
     {
         $spreadsheet = new Spreadsheet();
 
@@ -413,7 +471,7 @@ class HarvestScheduleController extends Controller
         $sheet->setCellValue('I1', 'komoditas');
         $sheet->setCellValue('J1', 'panen');
         $sheet->setCellValue('K1', 'jenis_sampel');
-        $sheet->setCellValue('L1', 'email_petugas');
+        $sheet->setCellValue('L1', 'no_hp');
 
         $sheet = $spreadsheet->createSheet();
         $sheet->setTitle('Penjelasan Template');
@@ -447,14 +505,14 @@ class HarvestScheduleController extends Controller
         $sheet->setCellValue('A11', 'panen');
         $sheet->setCellValue('B11', 'Bulan Panen');
         $sheet->setCellValue('C11', 'Isikan bulan panen. Contoh: 1');
-        $sheet->setCellValue('D11', '1' . "\n" . '2' . "\n" . '3' . "\n" . '4');
+        $sheet->setCellValue('D11', '1' . "\n" . '2' . "\n" . '3' . "\n" . '4' . "\n" . '5' . "\n" . '6' . "\n" . '7' . "\n" . '8' . "\n" . '9' . "\n" . '10' . "\n" . '11' . "\n" . '12');
         $sheet->setCellValue('A12', 'jenis_sampel');
         $sheet->setCellValue('B12', 'Jenis Sampel');
         $sheet->setCellValue('C12', 'Isikan jenis sampel, utama atau cadangan. Contoh: Utama');
         $sheet->setCellValue('D12', 'Utama' . "\n" . 'Cadangan');
         $sheet->setCellValue('A13', 'email_petugas');
         $sheet->setCellValue('B13', 'Email Petugas');
-        $sheet->setCellValue('C13', 'Isikan email petugas untuk sampel. Bisa melihat sheet master petugas. Contoh: dopokan@gmail.com');
+        $sheet->setCellValue('C13', 'Isikan no hape petugas untuk sampel tanpa angka 0 atau +62. Bisa melihat sheet master petugas. Contoh: 812345678910');
         $sheet->setCellValue('D13', 'Lihat Sheet Master Petugas');
 
         $style = $sheet->getStyle('A1:Z1000');
@@ -493,11 +551,11 @@ class HarvestScheduleController extends Controller
         $sheet->setTitle('Master Petugas');
         $i = 1;
         $sheet->setCellValue('A' . $i, 'Nama Petugas');
-        $sheet->setCellValue('B' . $i, 'Email');
+        $sheet->setCellValue('B' . $i, 'No HP');
         $i++;
         foreach (User::all() as $user) {
             $sheet->setCellValue('A' . $i, $user->name);
-            $sheet->setCellValue('B' . $i, $user->email);
+            $sheet->setCellValue('B' . $i, "'" . $user->email);
             $i++;
         }
 
@@ -514,14 +572,121 @@ class HarvestScheduleController extends Controller
 
         // Set headers to download the file rather than displaying it
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="template.xlsx"');
+        header('Content-Disposition: attachment;filename="template palawija.xlsx"');
         header('Cache-Control: max-age=0');
 
         // Output the generated file to browser
         $writer->save('php://output');
     }
 
-    function dashboard() {
+    public function generateTemplatePadi()
+    {
+        $spreadsheet = new Spreadsheet();
+
+        // Add some data to the first sheet
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Template');
+        $sheet->setCellValue('A1', 'kode_kec');
+        $sheet->setCellValue('B1', 'kode_desa');
+        $sheet->setCellValue('C1', 'no_segmen');
+        $sheet->setCellValue('D1', 'subsegmen');
+        $sheet->setCellValue('E1', 'komoditas');
+        $sheet->setCellValue('F1', 'panen');
+        $sheet->setCellValue('G1', 'jenis_sampel');
+        $sheet->setCellValue('H1', 'no_hp');
+
+        $sheet = $spreadsheet->createSheet();
+        $sheet->setTitle('Penjelasan Template');
+        $sheet->setCellValue('A3', 'Nama Kolom');
+        $sheet->setCellValue('B3', 'Variabel');
+        $sheet->setCellValue('C3', 'Penjelasan');
+        $sheet->setCellValue('D3', 'Nilai yang bisa diisi');
+        $sheet->setCellValue('A4', 'kode_kec dan kode_desa');
+        $sheet->setCellValue('B4', 'Kode Kecamatan dand Kode Desa');
+        $sheet->setCellValue('C4', 'Isikan kode kecamatan dan kode desa. Contoh: 010, 009');
+        $sheet->setCellValue('D4', 'Lihat Master Blok Sensus');
+        $sheet->setCellValue('A5', 'no_segmen');
+        $sheet->setCellValue('B5', 'Nomor Segmen');
+        $sheet->setCellValue('C5', 'Isikan nomor segmen dalam dua digit. Contoh: 01');
+        $sheet->setCellValue('A6', 'subsegmen');
+        $sheet->setCellValue('B6', 'Subsegmen');
+        $sheet->setCellValue('C6', 'Isikan subsegmen. Contoh: A1, A2, A3, B1, B2, B3, C1, C2, C3');
+        $sheet->setCellValue('C6', 'A1' . "\n" . 'A2' . "\n" . 'A3' . "\n" . 'B1' . "\n" . 'B2' . "\n" . 'B3' . "\n" . 'C1' . "\n" . 'C2' . "\n" . 'C3');
+        $sheet->setCellValue('A7', 'komoditas');
+        $sheet->setCellValue('B7', 'Komoditas');
+        $sheet->setCellValue('C7', 'Isikan jenis komoditas sampel. Contoh: Padi');
+        $sheet->setCellValue('D7', 'Padi');
+        $sheet->setCellValue('A8', 'panen');
+        $sheet->setCellValue('B8', 'Bulan Panen');
+        $sheet->setCellValue('C8', 'Isikan bulan panen. Contoh: 1');
+        $sheet->setCellValue('D8', '1' . "\n" . '2' . "\n" . '3' . "\n" . '4' . "\n" . '5' . "\n" . '6' . "\n" . '7' . "\n" . '8' . "\n" . '9' . "\n" . '10' . "\n" . '11' . "\n" . '12');
+        $sheet->setCellValue('A9', 'jenis_sampel');
+        $sheet->setCellValue('B9', 'Jenis Sampel');
+        $sheet->setCellValue('C9', 'Isikan jenis sampel, utama atau cadangan. Contoh: Utama');
+        $sheet->setCellValue('D9', 'Utama' . "\n" . 'Cadangan');
+        $sheet->setCellValue('A10', 'email_petugas');
+        $sheet->setCellValue('B10', 'Email Petugas');
+        $sheet->setCellValue('C10', 'Isikan no hape petugas untuk sampel tanpa angka 0 atau +62. Bisa melihat sheet master petugas. Contoh: 812345678910');
+        $sheet->setCellValue('D10', 'Lihat Sheet Master Petugas');
+
+        $style = $sheet->getStyle('A1:Z1000');
+        $alignment = $style->getAlignment();
+        $alignment->setVertical(Alignment::VERTICAL_TOP);
+
+        $sheet->getColumnDimension('A')->setAutoSize(true);
+        $sheet->getColumnDimension('B')->setAutoSize(true);
+        $sheet->getColumnDimension('C')->setWidth(50);
+        $sheet->getColumnDimension('D')->setAutoSize(true);
+        $sheet->getColumnDimension('E')->setWidth(50);
+
+        $style = $sheet->getStyle('C1:e1000');
+        $alignment = $style->getAlignment();
+        $alignment->setWrapText(true);
+
+        $style = $sheet->getStyle('A3:Z3');
+        $font = $style->getFont();
+        $font->setBold(true);
+        $font->setSize(14);
+
+        $style = $sheet->getStyle('E4');
+        $font = $style->getFont();
+        $font->setBold(true);
+        $font->setSize(11);
+
+        $sheet = $spreadsheet->createSheet();
+        $sheet->setTitle('Master Petugas');
+        $i = 1;
+        $sheet->setCellValue('A' . $i, 'Nama Petugas');
+        $sheet->setCellValue('B' . $i, 'No HP');
+        $i++;
+        foreach (User::all() as $user) {
+            $sheet->setCellValue('A' . $i, $user->name);
+            $sheet->setCellValue('B' . $i, "'" . $user->email);
+            $i++;
+        }
+
+        $spreadsheet->setActiveSheetIndex(0);
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $style = $sheet->getStyle('A1:Z1');
+        $font = $style->getFont();
+        $font->setBold(true);
+        $font->setSize(11);
+
+        // Create a writer object
+        $writer = new Xlsx($spreadsheet);
+
+        // Set headers to download the file rather than displaying it
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="template padi.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        // Output the generated file to browser
+        $writer->save('php://output');
+    }
+
+    function dashboard()
+    {
         return view('dashboard');
     }
 }

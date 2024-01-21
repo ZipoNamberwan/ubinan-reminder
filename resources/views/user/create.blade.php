@@ -75,7 +75,7 @@
                                     @enderror
                                 </div>
                             </div>
-                            <div class="row">
+                            <!-- <div class="row">
                                 <div class="col-md-6 mt-3">
                                     <label class="form-control-label" for="email">Email <span class="text-danger">*</span></label>
                                     <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" id="validationCustom03" value="{{ @old('email') }}">
@@ -85,10 +85,11 @@
                                     </div>
                                     @enderror
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="row">
                                 <div class="col-md-6 mt-3">
                                     <label class="form-control-label" for="password">Nomor Whatsapp <span class="text-danger">*</span></label>
+                                    <p>Nomor ini akan digunakan untuk login</p>
                                     <div class="input-group input-group-merge">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">

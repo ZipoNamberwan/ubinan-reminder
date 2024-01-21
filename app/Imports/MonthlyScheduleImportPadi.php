@@ -7,6 +7,7 @@ use App\Models\Commodity;
 use App\Models\Month;
 use App\Models\MonthlySchedule;
 use App\Models\SampleType;
+use App\Models\SubSegment;
 use App\Models\User;
 use App\Models\Year;
 use Illuminate\Validation\Rule;
@@ -17,7 +18,7 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Maatwebsite\Excel\Concerns\WithValidation;
 
-class MonthlyScheduleImport implements ToModel, WithHeadingRow, SkipsEmptyRows, WithBatchInserts, WithValidation, WithMultipleSheets
+class MonthlyScheduleImportPadi implements ToModel, WithHeadingRow, SkipsEmptyRows, WithBatchInserts, WithValidation, WithMultipleSheets
 {
 
     public $year;
@@ -37,14 +38,16 @@ class MonthlyScheduleImport implements ToModel, WithHeadingRow, SkipsEmptyRows, 
     {
         return new MonthlySchedule([
             'user_id' => User::where(['email' => $row['no_hp']])->first()->id,
-            'month_id' => Month::find(/* ($this->subround - 1) * 4 +  */$row['panen'])->id,
+            'month_id' => Month::find($row['panen'])->id,
             'year_id' => Year::find($this->year)->id,
-            'commodity_id' => Commodity::where(['name' => ucfirst(strtolower($row['komoditas']))])->first()->id,
-            'bs_id' => Bs::where(['long_code' => ($row['kode_kec'] . $row['kode_desa'] . $row['nbs'])])->first()->id,
-            'address' => $row['alamat'],
-            'name' => $row['nama_krt'],
-            'nks' => $row['nks'],
-            'sample_number' => $row['no_sample'],
+            'commodity_id' => 1,
+            'bs_id' => Bs::where(['long_code' => ($row['kode_kec'] . $row['kode_desa'] . '001B')])->first()->id,
+            'address' => '',
+            'name' => '',
+            'nks' => 1,
+            'sample_number' => 1,
+            'segment' => $row['no_segmen'],
+            'subsegment_id' => SubSegment::where(['code' => $row['subsegmen']])->first()->id,
             'sample_type_id' => SampleType::where(['name' => ucfirst(strtolower($row['jenis_sampel']))])->first()->id,
         ]);
     }
@@ -59,15 +62,17 @@ class MonthlyScheduleImport implements ToModel, WithHeadingRow, SkipsEmptyRows, 
         return [
             '*.kode_kec' => 'required',
             '*.kode_desa' => 'required',
-            '*.nbs' => 'required',
-            '*.nama_sls' => 'required',
-            '*.nks' => 'required',
-            '*.no_sample' => 'required',
-            '*.nama_krt' => 'required',
-            '*.alamat' => 'required',
-            '*.komoditas' => ['required', Rule::in(Commodity::where('id', '!=', 1)->get()->pluck(['name'])),],
+            // '*.nbs' => 'required',
+            // '*.nama_sls' => 'required',
+            // '*.nks' => 'required',
+            // '*.no_sample' => 'required',
+            // '*.nama_krt' => 'required',
+            // '*.alamat' => 'required',
+            // '*.komoditas' => ['required', Rule::in(Commodity::where('id', '!=', 1)->get()->pluck(['name'])),],
             '*.panen' => ['required', Rule::in([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]),],
             '*.jenis_sampel' => ['required', Rule::in(['Utama', 'Cadangan']),],
+            '*.no_segmen' => ['required', 'min:1', 'max:99'],
+            '*.subsegmen' => ['required', Rule::in(SubSegment::all()->pluck('code')),],
             '*.no_hp' => ['required', Rule::in(User::all()->pluck('email'))],
         ];
     }
@@ -108,6 +113,8 @@ class MonthlyScheduleImport implements ToModel, WithHeadingRow, SkipsEmptyRows, 
             'panen' => 'Perkiraan Bulan Panen',
             'jenis_sampel' => 'Jenis Sampel',
             'no_hp' => 'No HP Petugas',
+            'no_segmen' => 'Nomor Segmen',
+            'subsegmen' => 'Sub Segmen'
         ];
     }
 

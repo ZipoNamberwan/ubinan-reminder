@@ -53,20 +53,28 @@
                                     </p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p class="mb-0"><span class="badge badge-primary">{{$schedule->bs->fullcode()}}</span></p>
-                                    <p class="mb-0"><span class="badge badge-success"> {{$schedule->bs->fullname()}} </span></p>
-                                    <p class="mb-0"><span class="badge badge-warning"> {{$schedule->nks}} </span></p>
+                                    <p class="mb-0"><span class="badge badge-primary">{{$schedule->commodity->id != 1 ? $schedule->bs->fullcode() : $schedule->bs->fullcodesegment() . sprintf('%02d', $schedule->segment)}}</span></p>
+                                    <p class="mb-0"><span class="badge badge-success"> {{$schedule->commodity->id != 1 ? $schedule->bs->fullname() : $schedule->bs->fullnamesegment()}} </span></p>
+                                    <p class="mb-0"><span class="badge badge-warning"> {{$schedule->commodity->id != 1 ? $schedule->nks : $schedule->subSegment->code}} </span></p>
                                 </div>
                             </div>
                             <div class="row mt-2">
                                 <div class="col-md-6">
                                     <p class="h4">
+                                        @if($schedule->commodity->id != 1)
                                         Responden
+                                        @else
+                                        Subsegmen
+                                        @endif
                                     </p>
                                 </div>
                                 <div class="col-md-6">
+                                    @if($schedule->commodity->id != 1)
                                     <p class="mb-0">{{ucfirst(strtolower($schedule->name))}} ({{$schedule->sample_number}})</p>
                                     <p>{{ucfirst(strtolower($schedule->address))}} </p>
+                                    @else
+                                    <p>{{$schedule->subSegment->code}}</p>
+                                    @endif
                                 </div>
                             </div>
                             <div class="row">

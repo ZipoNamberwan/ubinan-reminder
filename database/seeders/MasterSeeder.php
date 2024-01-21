@@ -14,6 +14,7 @@ use App\Models\Year;
 use App\Models\MonthlySchedule;
 use App\Models\HarvestSchedule;
 use App\Models\Quote;
+use App\Models\SubSegment;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 
@@ -62,41 +63,41 @@ class MasterSeeder extends Seeder
 
         $admin = User::create([
             'name' => 'Admin',
-            'email' => 'admin@bps.go.id',
+            'email' => '82236981381',
             'password' => bcrypt('123456'),
-            'phone_number' => '82236981385',
+            'phone_number' => '82236981381',
         ]);
         $admin->assignRole('Admin');
 
         $sp = User::create([
             'name' => 'supervisor1',
-            'email' => 'sp1@gmail.com',
+            'email' => '82236981382',
             'password' => bcrypt('123456'),
-            'phone_number' => '82236981385',
+            'phone_number' => '82236981382',
         ]);
         $sp->assignRole('PML');
 
         $user1 = User::create([
             'name' => 'user1',
-            'email' => 'user1@gmail.com',
+            'email' => '82236981383',
             'password' => bcrypt('123456'),
-            'phone_number' => '82236981385',
+            'phone_number' => '82236981383',
             'supervisor_id' => $sp->id
         ]);
         $user1->assignRole('PPL');
 
         $user2 = User::create([
             'name' => 'user2',
-            'email' => 'user2@gmail.com',
+            'email' => '82236981384',
             'password' => bcrypt('123456'),
-            'phone_number' => '82236981385',
+            'phone_number' => '82236981384',
             'supervisor_id' => $sp->id
         ]);
         $user2->assignRole('PPL');
 
         $sp = User::create([
-            'name' => 'supervisor1',
-            'email' => 'sp2@gmail.com',
+            'name' => 'supervisor2',
+            'email' => '82236981385',
             'password' => bcrypt('123456'),
             'phone_number' => '82236981385',
         ]);
@@ -104,18 +105,18 @@ class MasterSeeder extends Seeder
 
         $user3 = User::create([
             'name' => 'user3',
-            'email' => 'user3@gmail.com',
+            'email' => '82236981386',
             'password' => bcrypt('123456'),
-            'phone_number' => '82236981385',
+            'phone_number' => '82236981386',
             'supervisor_id' => $sp->id
         ]);
         $user3->assignRole('PPL');
 
         $user4 = User::create([
             'name' => 'user4',
-            'email' => 'user4@gmail.com',
+            'email' => '82236981387',
             'password' => bcrypt('123456'),
-            'phone_number' => '82236981385',
+            'phone_number' => '82236981387',
             'supervisor_id' => $sp->id
         ]);
         $user4->assignRole('PPL');
@@ -4170,11 +4171,21 @@ class MasterSeeder extends Seeder
         Bs::create(['name' => '018B', 'short_code' => '018B', 'long_code' => '240013018B', 'village_id' => $desa240013->id]);
         Bs::create(['name' => '019B', 'short_code' => '019B', 'long_code' => '240013019B', 'village_id' => $desa240013->id]);
 
+        SubSegment::create(['code' => 'A1']);
+        SubSegment::create(['code' => 'A2']);
+        SubSegment::create(['code' => 'A3']);
+        SubSegment::create(['code' => 'B1']);
+        SubSegment::create(['code' => 'B2']);
+        SubSegment::create(['code' => 'B3']);
+        SubSegment::create(['code' => 'C1']);
+        SubSegment::create(['code' => 'C2']);
+        SubSegment::create(['code' => 'C3']);
+
         SampleType::create(['name' => 'Utama']);
         SampleType::create(['name' => 'Cadangan']);
 
-        MonthlySchedule::factory()->count(500)->create();
-        HarvestSchedule::factory()->count(250)->create();
+        // MonthlySchedule::factory()->count(500)->create();
+        // HarvestSchedule::factory()->count(250)->create();
 
         Quote::create(['quote' => 'Kerja keraslah sampai tetangga berpikir rezekimu hasil dari pesugihan.']);
         Quote::create(['quote' => 'Masalah bisa membuat kita semakin dewasa, maka sering-seringlah bermasalah.']);

@@ -83,9 +83,11 @@
                                 <div class="form-group mb-3">
                                     <div class="input-group input-group-merge input-group-alternative">
                                         <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="ni ni-circle-08"></i></span>
+                                            <span class="input-group-text">
+                                                +62
+                                            </span>
                                         </div>
-                                        <input id="email" type="text" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" autofocus placeholder="Email">
+                                        <input id="email" type="number" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" autofocus placeholder="No HP">
                                     </div>
                                     @error('email')
                                     <span class="error-feedback" role="alert">
@@ -106,6 +108,7 @@
                                     </span>
                                     @enderror
                                 </div>
+                                <p class="description">*Nomor HP tidak perlu menuliskan angka 0</p>
                                 <div class="custom-control custom-control-alternative custom-checkbox">
                                     <input class="custom-control-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
                                     <label class="custom-control-label" for="remember">

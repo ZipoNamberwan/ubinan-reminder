@@ -19,7 +19,7 @@
                         <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
                             <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
                             <li class="breadcrumb-item"><a href="/">Home</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Upload Jadwal Ubinan Bulanan Palawija</li>
+                            <li class="breadcrumb-item active" aria-current="page">Upload Jadwal Ubinan Bulanan Padi</li>
                         </ol>
                     </nav>
                 </div>
@@ -56,12 +56,12 @@
                 <div class="card">
                     <!-- Card header -->
                     <div class="card-header pb-0">
-                        <h3>Upload Jadwal Ubinan Bulanan Palawija</h3>
+                        <h3>Upload Jadwal Ubinan Bulanan Padi</h3>
                         <p class="text-sm"><span>Upload dilakukan setiap Subround. Perhatian! Melakukan upload akan menghapus semua jadwal ubinan bulanan dan jadwal panen yang sudah diupload sebelumnya dalam satu Subround</span></p>
                     </div>
                     <!-- Card body -->
                     <div class="card-body">
-                        <form autocomplete="off" method="post" action="/template-palawija" class="needs-validation mb-4" enctype="multipart/form-data" novalidate>
+                        <form autocomplete="off" method="post" action="/template-padi" class="needs-validation mb-4" enctype="multipart/form-data" novalidate>
                             @csrf
                             <div class="row">
                                 <div class="col-md-6">
@@ -70,7 +70,7 @@
                             </div>
                             <button type="submit" class="btn btn-outline-primary">Unduh Template</button>
                         </form>
-                        <form id="formupload" autocomplete="off" method="post" action="/upload-palawija" class="needs-validation" enctype="multipart/form-data" novalidate>
+                        <form id="formupload" autocomplete="off" method="post" action="/upload-padi" class="needs-validation" enctype="multipart/form-data" novalidate>
                             @csrf
                             <div class="row mb-3">
                                 <div class="col-md-6">
@@ -84,24 +84,6 @@
                                         @endforeach
                                     </select>
                                     @error('year')
-                                    <div class="text-valid mt-2">
-                                        {{ $message }}
-                                    </div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-control-label">Subround</span></label>
-                                    <select id="subround" name="subround" class="form-control" data-toggle="select" name="subround" required>
-                                        <option value="0" disabled selected> -- Pilih Subround -- </option>
-                                        @foreach ($subrounds as $subround)
-                                        <option value="{{$subround}}" {{ old('subround') == $subround ? 'selected' : '' }}>
-                                            {{ $subround }}
-                                        </option>
-                                        @endforeach
-                                    </select>
-                                    @error('subround')
                                     <div class="text-valid mt-2">
                                         {{ $message }}
                                     </div>
@@ -123,7 +105,7 @@
                                     @enderror
                                 </div>
                             </div>
-                            <button onclick="uploadFormClick()" class="btn btn-primary mt-3" id="sbmtbtn" type="submit">Upload</button>
+                            <button class="btn btn-primary mt-3" id="sbmtbtn" type="submit">Upload</button>
                             <!-- <button class="btn btn-primary mt-3" id="sbmtbtn" type="submit">Upload</button> -->
                         </form>
                     </div>
@@ -149,60 +131,4 @@
     }
 </script>
 
-<script>
-    function uploadFormClick() {
-        event.preventDefault();
-        document.getElementById('loading-background').style.display = 'block'
-
-        var year = document.getElementById("year");
-        var idyear = year.options[year.selectedIndex].value;
-
-        var subround = document.getElementById("subround");
-        var idsubround = subround.options[subround.selectedIndex].value;
-
-        var file_data = $('#file').prop('files')[0];
-        if (file_data == null || idyear == null || idsubround == null) {
-            document.getElementById('formupload').submit();
-        } else {
-            var form_data = new FormData();
-            form_data.append('file', file_data);
-
-            document.getElementById('sbmtbtn').disabled = true
-            $.ajax({
-                url: '/check-upload/' + idyear + '/' + idsubround,
-                type: 'GET',
-                success: function(response) {
-                    document.getElementById('sbmtbtn').disabled = false
-                    console.log(response)
-                    if (response.is_data_exist === true) {
-                        Swal.fire({
-                            title: 'Perhatian',
-                            text: 'Sudah ada data jadwal panen pada Subround ini, mengupload data lagi akan menghapus data yang sudah ada. Lanjutkan?',
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Ya',
-                            cancelButtonText: 'Tidak',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                document.getElementById('formupload').submit();
-                            } else {
-                                document.getElementById('loading-background').style.display = 'none'
-                            }
-                        })
-                    } else {
-                        document.getElementById('formupload').submit();
-                    }
-
-                },
-                error: function(jqXHR, textStatus, errorMessage) {
-                    document.getElementById('sbmtbtn').disabled = false
-                    console.log('Error uploading file: ' + errorMessage);
-                    document.getElementById('loading-background').style.display = 'none'
-                }
-            });
-        }
-    }
-</script>
 @endsection

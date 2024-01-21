@@ -44,6 +44,24 @@
                             @csrf
                             <div class="row">
                                 <div class="col-md-4 mt-3">
+                                    <label class="form-control-label">Komoditas <span class="text-danger">*</span></label>
+                                    <select id="commodity" name="commodity" class="form-control" data-toggle="select" required>
+                                        <option value="0" disabled selected> -- Pilih Komoditas -- </option>
+                                        @foreach ($commodities as $commodity)
+                                        <option value="{{ $commodity->id }}" {{ old('commodity') == $commodity->id ? 'selected' : '' }}>
+                                            {{ $commodity->name }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                    @error('commodity')
+                                    <div class="text-valid mt-2">
+                                        {{ $message }}
+                                    </div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mt-3">
                                     <label class="form-control-label">Kecamatan <span class="text-danger">*</span></label>
                                     <select id="subdistrict" name="subdistrict" class="form-control" data-toggle="select" name="subdistrict" required>
                                         <option value="0" disabled selected> -- Pilih Kecamatan -- </option>
@@ -116,22 +134,6 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-4 mt-3">
-                                    <label class="form-control-label">Komoditas <span class="text-danger">*</span></label>
-                                    <select id="commodity" name="commodity" class="form-control" data-toggle="select" required>
-                                        <option value="0" disabled selected> -- Pilih Komoditas -- </option>
-                                        @foreach ($commodities as $commodity)
-                                        <option value="{{ $commodity->id }}" {{ old('commodity') == $commodity->id ? 'selected' : '' }}>
-                                            {{ $commodity->name }}
-                                        </option>
-                                        @endforeach
-                                    </select>
-                                    @error('commodity')
-                                    <div class="text-valid mt-2">
-                                        {{ $message }}
-                                    </div>
-                                    @enderror
-                                </div>
                                 <div class="col-md-4 mt-3">
                                     <label class="form-control-label">Jenis Sampel <span class="text-danger">*</span></label>
                                     <select id="sample-type" name="sample-type" class="form-control" data-toggle="select" required>

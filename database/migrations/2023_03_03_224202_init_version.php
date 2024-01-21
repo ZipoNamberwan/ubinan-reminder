@@ -32,6 +32,10 @@ return new class extends Migration
             $table->string('name');
             $table->foreignId('village_id')->constrained('villages');
         });
+        Schema::create('subsegments', function (Blueprint $table) {
+            $table->id()->autoincrement();
+            $table->string('code')->unique();
+        });
 
         Schema::create('sample_types', function (Blueprint $table) {
             $table->bigIncrements('id');
@@ -65,6 +69,10 @@ return new class extends Migration
             $table->string('sample_number');
             $table->string('name');
             $table->string('nks');
+
+            $table->integer('segment')->nullable();
+            $table->foreignId('subsegment_id')->nullable()->constrained('subsegments');
+            
             $table->foreignId('sample_type_id')->constrained('sample_types');
             $table->integer('reminder_num')->default(0);
             $table->timestamps();

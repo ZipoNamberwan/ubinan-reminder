@@ -167,9 +167,14 @@
                 "data": "resp_name",
                 "render": function(data, type, row) {
                     if (type === 'display') {
-                        return '<strong>' + data + '</strong>' + '<br>' +
-                            'No Sampel: ' + row.sample_number + '<br/>' +
-                            row.resp_address;
+                        if (row.commodity_id != 1) {
+                            return '<strong>' + data + '</strong>' + '<br>' +
+                                'No Sampel: ' + row.sample_number + '<br/>' +
+                                row.resp_address;
+                        } else {
+                            return '<strong>' + data + '</strong>' + '<br>';
+                        }
+
                     }
                     return data;
                 }

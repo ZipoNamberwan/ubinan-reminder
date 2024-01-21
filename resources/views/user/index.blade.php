@@ -76,7 +76,7 @@
                                     <thead class="thead-light">
                                         <tr>
                                             <th>Nama</th>
-                                            <th>Email</th>
+                                            <!-- <th>Email</th> -->
                                             <th>No HP</th>
                                             <th>Peran</th>
                                             <th>Pengawas</th>
@@ -117,12 +117,7 @@
             },
             {
                 "responsivePriority": 1,
-                "width": "5%",
-                "data": "email",
-            },
-            {
-                "responsivePriority": 1,
-                "width": "5%",
+                "width": "10%",
                 "data": "phone_number",
             },
             {
