@@ -11,6 +11,7 @@ use App\Models\Quote;
 use DateInterval;
 use DatePeriod;
 use DateTime;
+use Exception;
 
 class MessageController extends Controller
 {
@@ -55,85 +56,89 @@ class MessageController extends Controller
             }
         }
 
-        if ($selectedBreakpoint != null) {
+        // if ($selectedBreakpoint != null) {
 
-            //send monthly reminder
-            $year = null;
-            $month = null;
-            $schedules = null;
+        //     //send monthly reminder
+        //     $year = null;
+        //     $month = null;
+        //     $schedules = null;
 
-            if ($selectedBreakpoint[1] == 'next') {
-                $year = Year::where(['name' => date('Y', strtotime($firstOfNextMonth))])->first();
-                $month = Month::find(intval(date("m", strtotime($firstOfNextMonth))));
-                $schedules = MonthlySchedule::where('year_id', $year->id)->where('month_id', $month->id)->get();
-            } else {
-                $year = Year::where(['name' => date('Y', strtotime($today))])->first();
-                $month = Month::find(intval(date("m", strtotime($today))));
-                $schedules = MonthlySchedule::where('year_id', $year->id)->where('month_id', $month->id)->get();
-                $schedules = $schedules->filter(function ($q) {
-                    return $q->harvestSchedule == null;
-                });
-            }
+        //     if ($selectedBreakpoint[1] == 'next') {
+        //         $year = Year::where(['name' => date('Y', strtotime($firstOfNextMonth))])->first();
+        //         $month = Month::find(intval(date("m", strtotime($firstOfNextMonth))));
+        //         $schedules = MonthlySchedule::where('year_id', $year->id)->where('month_id', $month->id)->get();
+        //     } else {
+        //         $year = Year::where(['name' => date('Y', strtotime($today))])->first();
+        //         $month = Month::find(intval(date("m", strtotime($today))));
+        //         $schedules = MonthlySchedule::where('year_id', $year->id)->where('month_id', $month->id)->get();
+        //         $schedules = $schedules->filter(function ($q) {
+        //             return $q->harvestSchedule == null;
+        //         });
+        //     }
 
-            $totalSample = count($schedules);
+        //     $totalSample = count($schedules);
 
-            foreach ($schedules as $schedule) {
-                $transformedData['monthly'][$schedule->user->getPML->id][$schedule->user->id][] = $schedule;
-            }
+        //     foreach ($schedules as $schedule) {
+        //         $transformedData['monthly'][$schedule->user->getPML->id][$schedule->user->id][] = $schedule;
+        //     }
 
-            foreach ($transformedData['monthly'] as $pmlId => $pplschedules) {
-                $pml = User::find($pmlId);
-                $pplmap = [];
-                foreach ($pplschedules as $pplId => $schedules) {
-                    $samples = [];
-                    $scheduleIds = [];
-                    foreach ($schedules as $schedule) {
-                        $samples[] = "🚩" . $schedule->bs->fullname() . " " . $schedule->name . " (*" . $schedule->commodity->name . "*) ";
-                        $scheduleIds[] = $schedule->id;
-                    }
-                    $ppl = User::find($pplId);
-                    $prefixppl = '';
-                    if ($selectedBreakpoint[1] == 'next') {
-                        $prefixppl = "Selamat pagi, *Ubinan Fighters….!!!*🤩🤩🤩 \r\n\r\nBulan depan (*" . $month->name . "*) Anda punya *" . count($schedules) . " sampel ubinan*. Berikut daftar sampel ubinan bulan depan 💪💪💪 \r\n \r\n";
-                    } else {
-                        $prefixppl = "Selamat pagi, *Ubinan Fighters….!!!*🤩🤩🤩 \r\n\r\nMengingaatkan kembali, bulan ini (*" . $month->name . "*) Anda masih punya *" . count($schedules) . " sampel ubinan yang belum diisi tanggal perkiraan panennya*. Berikut daftar sampel ubinan tersebut 💪💪💪 \r\n \r\n";
-                    }
-                    $pplMessage = implode("\r\n", $samples);
-                    $suffixppl = "\r\n\r\nMohon segera melakukan *input perkiraan tanggal panen* untuk sampel tersebut melalui link➡️ \r\n\r\n" . url("/jadwal-ubinan?month=" . $month->id) . " \r\n\r\n*Semangat Ubinan*, Huha…😸😸\r\n\r\nNb: Pesan 💚 Khusus untuk: *" . $ppl->name . "*";
-                    $message[] = ["message" => $prefixppl . $pplMessage . $suffixppl, "phone_number" => "+62" . $ppl->phone_number, "type" => 'monthly', "sent_to" => $ppl->name, "ids" => $scheduleIds, "role" => $ppl->roles->first()->name];
+        //     foreach ($transformedData['monthly'] as $pmlId => $pplschedules) {
+        //         $pml = User::find($pmlId);
+        //         $pplmap = [];
+        //         foreach ($pplschedules as $pplId => $schedules) {
+        //             $samples = [];
+        //             $scheduleIds = [];
+        //             foreach ($schedules as $schedule) {
+        //                 if ($schedule->commodity->id == 1) {
+        //                     $samples[] = "🚩" . $schedule->bs->fullnamesegment() . " " . $schedule->bs->fullcodesegment() . sprintf('%02d', $schedule->segment) . $schedule->subSegment->code . " (*" . $schedule->commodity->name . "*) ";
+        //                 } else {
+        //                     $samples[] = "🚩" . $schedule->bs->fullname() . " " . $schedule->name . " (*" . $schedule->commodity->name . "*) ";
+        //                 }
+        //                 $scheduleIds[] = $schedule->id;
+        //             }
+        //             $ppl = User::find($pplId);
+        //             $prefixppl = '';
+        //             if ($selectedBreakpoint[1] == 'next') {
+        //                 $prefixppl = "Selamat pagi, *Ubinan Fighters….!!!*🤩🤩🤩 \r\n\r\nBulan depan (*" . $month->name . "*) Anda punya *" . count($schedules) . " sampel ubinan*. Berikut daftar sampel ubinan bulan depan 💪💪💪 \r\n \r\n";
+        //             } else {
+        //                 $prefixppl = "Selamat pagi, *Ubinan Fighters….!!!*🤩🤩🤩 \r\n\r\nMengingaatkan kembali, bulan ini (*" . $month->name . "*) Anda masih punya *" . count($schedules) . " sampel ubinan yang belum diisi tanggal perkiraan panennya*. Berikut daftar sampel ubinan tersebut 💪💪💪 \r\n \r\n";
+        //             }
+        //             $pplMessage = implode("\r\n", $samples);
+        //             $suffixppl = "\r\n\r\nMohon segera melakukan *input perkiraan tanggal panen* untuk sampel tersebut melalui link➡️ \r\n\r\n" . url("/jadwal-ubinan?month=" . $month->id) . " \r\n\r\n*Semangat Ubinan*, Huha…😸😸\r\n\r\nNb: Pesan 💚 Khusus untuk: *" . $ppl->name . "*";
+        //             $message[] = ["message" => $prefixppl . $pplMessage . $suffixppl, "phone_number" => "+62" . $ppl->phone_number, "type" => 'monthly', "sent_to" => $ppl->name, "ids" => $scheduleIds, "role" => $ppl->roles->first()->name];
 
-                    $pplmap[] = ['name' => $ppl->name, 'total_sample' => count($schedules)];
-                }
-                $prefixpml = '';
-                if ($selectedBreakpoint[1] == 'next') {
-                    $prefixpml = "Selamat pagi, *PML Ubinan Fighters….!!!*🤩🤩🤩 \r\n\r\nBerikut adalah jumlah sampel ubinan bulan depan (*" . $month->name . "*) untuk PPL Anda 💪💪💪 \r\n \r\n";
-                } else {
-                    $prefixpml = "Selamat pagi, *PML Ubinan Fighters….!!!*🤩🤩🤩 \r\n\r\nBerikut adalah jumlah sampel ubinan bulan ini (*" . $month->name . "*) yang belum diinput tanggal perkiraan panennya oleh PPL 💪💪💪 \r\n \r\n";
-                }
-                $pmlMessage = '';
-                foreach ($pplmap as $map) {
-                    $pmlMessage = $pmlMessage . "🚩*" . $map['name'] . "* : *" . $map['total_sample'] . "* sampel" . "\r\n";
-                }
-                $suffixpml = "Mohon untuk mengingatkan kembali PPL untuk menginput perkiraan tanggal panen. Sampel selengkapnya dan perkiraan tanggal panen bisa diakses melalui link berikut➡️ \r\n\r\n" . url("/jadwal-ubinan?month=" . $month->id) . " \r\n\r\nNb: Pesan 💚 Khusus untuk: *" . $pml->name . "*";
+        //             $pplmap[] = ['name' => $ppl->name, 'total_sample' => count($schedules)];
+        //         }
+        //         $prefixpml = '';
+        //         if ($selectedBreakpoint[1] == 'next') {
+        //             $prefixpml = "Selamat pagi, *PML Ubinan Fighters….!!!*🤩🤩🤩 \r\n\r\nBerikut adalah jumlah sampel ubinan bulan depan (*" . $month->name . "*) untuk PPL Anda 💪💪💪 \r\n \r\n";
+        //         } else {
+        //             $prefixpml = "Selamat pagi, *PML Ubinan Fighters….!!!*🤩🤩🤩 \r\n\r\nBerikut adalah jumlah sampel ubinan bulan ini (*" . $month->name . "*) yang belum diinput tanggal perkiraan panennya oleh PPL 💪💪💪 \r\n \r\n";
+        //         }
+        //         $pmlMessage = '';
+        //         foreach ($pplmap as $map) {
+        //             $pmlMessage = $pmlMessage . "🚩*" . $map['name'] . "* : *" . $map['total_sample'] . "* sampel" . "\r\n";
+        //         }
+        //         $suffixpml = "Mohon untuk mengingatkan kembali PPL untuk menginput perkiraan tanggal panen. Sampel selengkapnya dan perkiraan tanggal panen bisa diakses melalui link berikut➡️ \r\n\r\n" . url("/jadwal-ubinan?month=" . $month->id) . " \r\n\r\nNb: Pesan 💚 Khusus untuk: *" . $pml->name . "*";
 
-                $message[] = ["message" => $prefixpml . $pmlMessage . $suffixpml, "phone_number" => "+62" . $pml->phone_number, "type" => "monthly", "sent_to" => $pml->name, "ids" => [], "role" => $pml->roles->first()->name];
-            }
+        //         $message[] = ["message" => $prefixpml . $pmlMessage . $suffixpml, "phone_number" => "+62" . $pml->phone_number, "type" => "monthly", "sent_to" => $pml->name, "ids" => [], "role" => $pml->roles->first()->name];
+        //     }
 
-            $admin = User::find(1);
-            $prefixadmin = "Selamat pagi *Admin Survei Ubinan* 🤩🤩🤩\r\n\r\n";
-            $adminMessage = '';
-            if ($selectedBreakpoint[1] == 'next') {
-                $adminMessage = "Hari ini telah dikirimkan Pengingat Bulanan untuk bulan *" . $month->name . "* kepada petugas Survei Ubinan. Secara keseluruhan ada total *" . $totalSample . " sampel*. Selanjutnya PPL akan mengisi jadwal panen untuk setiap sampel. Selengkapnya bisa dilihat di➡️ \r\n\r\n"
-                    . url("/") . "\r\n\r\ndengan menggunakan akun admin";
-            } else {
-                $adminMessage = "Hari ini telah dikirimkan Pengingat Bulanan untuk bulan *" . $month->name . "* kepada petugas Survei Ubinan yang belum menginput tanggal perkiraan panen. Secara keseluruhan ada total *" . $totalSample . " sampel yang belum diinput tanggal perkiraan panennya*. Selanjutnya PPL akan mengisi jadwal panen untuk setiap sampel. Selengkapnya bisa dilihat di➡️ \r\n\r\n"
-                    . url("/") . "\r\n\r\ndengan menggunakan akun admin";
-            }
+        //     $admin = User::find(1);
+        //     $prefixadmin = "Selamat pagi *Admin Survei Ubinan* 🤩🤩🤩\r\n\r\n";
+        //     $adminMessage = '';
+        //     if ($selectedBreakpoint[1] == 'next') {
+        //         $adminMessage = "Hari ini telah dikirimkan Pengingat Bulanan untuk bulan *" . $month->name . "* kepada petugas Survei Ubinan. Secara keseluruhan ada total *" . $totalSample . " sampel*. Selanjutnya PPL akan mengisi jadwal panen untuk setiap sampel. Selengkapnya bisa dilihat di➡️ \r\n\r\n"
+        //             . url("/") . "\r\n\r\ndengan menggunakan akun admin";
+        //     } else {
+        //         $adminMessage = "Hari ini telah dikirimkan Pengingat Bulanan untuk bulan *" . $month->name . "* kepada petugas Survei Ubinan yang belum menginput tanggal perkiraan panen. Secara keseluruhan ada total *" . $totalSample . " sampel yang belum diinput tanggal perkiraan panennya*. Selanjutnya PPL akan mengisi jadwal panen untuk setiap sampel. Selengkapnya bisa dilihat di➡️ \r\n\r\n"
+        //             . url("/") . "\r\n\r\ndengan menggunakan akun admin";
+        //     }
 
-            $suffixadmin = "\r\n\r\n*Terima kasih...*💪💪💪";
+        //     $suffixadmin = "\r\n\r\n*Terima kasih...*💪💪💪";
 
-            $message[] = ["message" => $prefixadmin . $adminMessage . $suffixadmin, "phone_number" => "+62" . $admin->phone_number, "type" => "monthly", "sent_to" => $admin->name, "ids" => [], "role" => $admin->roles->first()->name];
-        }
+        //     $message[] = ["message" => $prefixadmin . $adminMessage . $suffixadmin, "phone_number" => "+62" . $admin->phone_number, "type" => "monthly", "sent_to" => $admin->name, "ids" => [], "role" => $admin->roles->first()->name];
+        // }
 
         $gapDay = ['+1' => 'Besok', '+3' => '3 Hari Lagi'];
         $mapGapDay = [];
@@ -144,11 +149,13 @@ class MessageController extends Controller
             $mapGapDay[$gap] = ['date' => date("Y-m-d", strtotime("+" . $gap . " day", strtotime($today))), 'alias' => $alias];
         }
 
+        $messageCount = ['+1' => 0, '+3' => 0];
         if (count($schedules) > 0) {
             foreach ($schedules as $schedule) {
                 if ($schedule->harvestSchedule != null) {
                     foreach ($mapGapDay as $key => $map) {
                         if ($map['date'] == $schedule->harvestSchedule->date) {
+                            $messageCount[$key]++;
                             $transformedData['harvest'][$schedule->user->getPML->id][$schedule->user->id][$key][] = $schedule;
                         }
                     }
@@ -171,8 +178,13 @@ class MessageController extends Controller
                         $samples = [];
                         $scheduleIds = [];
                         foreach ($transformedSchedules as $transformedSchedule) {
-                            $samples[] = "🚩" . $transformedSchedule->bs->fullname() . " " . $transformedSchedule->name . " (*" . $transformedSchedule->commodity->name . "*) ";
-                            $pplmap[$gapkey][] = "🚩" . $transformedSchedule->bs->fullname() . " " . $transformedSchedule->name . " (*" . $transformedSchedule->commodity->name . "*) -- " . "*" . $transformedSchedule->user->name . "*";
+                            if ($transformedSchedule->commodity->id == 1) {
+                                $samples[] = "🚩" . $transformedSchedule->bs->fullnamesegment() . " " . $transformedSchedule->bs->fullcodesegment() . sprintf('%02d', $transformedSchedule->segment) . $transformedSchedule->subSegment->code . " (*" . $transformedSchedule->commodity->name . "*) ";
+                                $pplmap[$gapkey][] = "🚩" . $transformedSchedule->bs->fullnamesegment() . " " . $transformedSchedule->bs->fullcodesegment() . sprintf('%02d', $transformedSchedule->segment) . $transformedSchedule->subSegment->code . " (*" . $transformedSchedule->commodity->name . "*) -- " . "*" . $transformedSchedule->user->name . "*";
+                            } else {
+                                $samples[] = "🚩" . $transformedSchedule->bs->fullname() . " " . $transformedSchedule->name . " (*" . $transformedSchedule->commodity->name . "*) ";
+                                $pplmap[$gapkey][] = "🚩" . $transformedSchedule->bs->fullname() . " " . $transformedSchedule->name . " (*" . $transformedSchedule->commodity->name . "*) -- " . "*" . $transformedSchedule->user->name . "*";
+                            }
                             $scheduleIds[] = $transformedSchedule->id;
                         }
                         $pplMessage = $pplMessage . implode("\r\n", $samples);
@@ -193,6 +205,16 @@ class MessageController extends Controller
 
                 $message[] = ["message" => $prefixpml . $pmlMessage . $suffixpml, "phone_number" => "+62" . $pml->phone_number, "type" => "harvest", "sent_to" => $pml->name, "ids" => [], "role" => $pml->roles->first()->name];
             }
+
+            $admin = User::find(1);
+            $prefixadmin = "Selamat pagi *Admin Survei Ubinan* 🤩🤩🤩\r\n\r\n";
+            $adminMessage = "Hari ini telah dikirimkan reminder jadwal panen\r\n";
+            foreach ($gapDay as $key => $day) {
+                $adminMessage = $adminMessage . "🚩 *" . strtoupper($day) . "* ada *" . $messageCount[$key] . "* sampel\r\n";
+            }
+            $suffixadmin = "\r\n\r\n*Terima kasih...*💪💪💪";
+
+            $message[] = ["message" => $prefixadmin . $adminMessage . $suffixadmin, "phone_number" => "+62" . $admin->phone_number, "type" => "monthly", "sent_to" => $admin->name, "ids" => [], "role" => $admin->roles->first()->name];
         }
 
         return $message;
