@@ -21,7 +21,9 @@ class MainController extends Controller
     public function index()
     {
         $user = User::find(Auth::user()->id);
-        if ($user->hasRole('Admin') | $user->hasRole('PML')) {
+        if ($user->hasRole('Admin')) {
+            return redirect('/dashboard');
+        } else if ($user->hasRole('PML')) {
             return redirect('/jadwal-panen');
         } else {
             return redirect('/jadwal-ubinan');

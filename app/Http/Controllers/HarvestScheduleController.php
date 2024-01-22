@@ -11,6 +11,7 @@ use App\Models\Month;
 use App\Models\MonthlySchedule;
 use App\Models\SampleType;
 use App\Models\Subdistrict;
+use App\Models\SubSegment;
 use App\Models\User;
 use App\Models\Village;
 use App\Models\Year;
@@ -47,38 +48,85 @@ class HarvestScheduleController extends Controller
         $users = User::role('PPL')->get();
         $months = Month::all();
         $sampleTypes = SampleType::all();
+        $subsegments = SubSegment::all();
         $current_month = intval(date("m"));
 
-        return view('admin.add-schedule', ['current_month' => $current_month, 'subdistricts' => $subdistricts, 'subdistricts' => $subdistricts, 'commodities' => $commodities, 'users' => $users, 'months' => $months, 'sampleTypes' => $sampleTypes]);
+        return view('admin.add-schedule', [
+            'current_month' => $current_month,
+            'subdistricts' => $subdistricts,
+            'subdistricts' => $subdistricts,
+            'commodities' => $commodities,
+            'users' => $users,
+            'months' => $months,
+            'sampleTypes' => $sampleTypes,
+            'subsegments' => $subsegments
+        ]);
     }
     public function storeHarvestSchedule(Request $request)
     {
-        $this->validate($request, [
-            'subdistrict' => 'required',
-            'village' => 'required',
-            'bs' => 'required',
-            'name' => 'required',
-            'nks' => 'required',
-            'sample_number' => 'required',
-            'commodity' => 'required',
-            'sample-type' => 'required',
-            'month' => 'required',
-            'user' => 'required',
-            'address' => 'required',
-        ]);
+        if ($request->commodity == null) {
+            $this->validate($request, [
+                'commodity' => 'required',
+            ]);
+        } else {
+            if ($request->commodity == 1) {
+                $this->validate($request, [
+                    'subdistrict' => 'required',
+                    'village' => 'required',
+                    'no_segment' => 'required',
+                    'subsegment' => 'required',
+                    'commodity' => 'required',
+                    'sample-type' => 'required',
+                    'month' => 'required',
+                    'user' => 'required',
+                ]);
+            } else {
+                $this->validate($request, [
+                    'subdistrict' => 'required',
+                    'village' => 'required',
+                    'bs' => 'required',
+                    'name' => 'required',
+                    'nks' => 'required',
+                    'sample_number' => 'required',
+                    'commodity' => 'required',
+                    'sample-type' => 'required',
+                    'month' => 'required',
+                    'user' => 'required',
+                    'address' => 'required',
+                ]);
+            }
+        }
 
-        MonthlySchedule::create([
-            'bs_id' => $request->bs,
-            'name' => $request->name,
-            'nks' => $request->nks,
-            'sample_number' => $request->sample_number,
-            'commodity_id' => $request->commodity,
-            'sample_type_id' => $request['sample-type'],
-            'month_id' => $request->month,
-            'year_id' => Year::firstWhere('name', date("Y"))->id,
-            'user_id' => $request->user,
-            'address' => $request->address,
-        ]);
+        if ($request->commodity == 1) {
+            $bscode = Village::find($request->village)->long_code . '001';
+            MonthlySchedule::create([
+                'bs_id' => Bs::where('long_code', 'like', '%' . $bscode . '%')->first()->id,
+                'name' => '',
+                'nks' => 1,
+                'sample_number' => 1,
+                'commodity_id' => $request->commodity,
+                'sample_type_id' => $request['sample-type'],
+                'month_id' => $request->month,
+                'year_id' => Year::firstWhere('name', date("Y"))->id,
+                'user_id' => $request->user,
+                'address' => '',
+                'segment' => $request->no_segment,
+                'subsegment_id' => $request->subsegment,
+            ]);
+        } else {
+            MonthlySchedule::create([
+                'bs_id' => $request->bs,
+                'name' => $request->name,
+                'nks' => $request->nks,
+                'sample_number' => $request->sample_number,
+                'commodity_id' => $request->commodity,
+                'sample_type_id' => $request['sample-type'],
+                'month_id' => $request->month,
+                'year_id' => Year::firstWhere('name', date("Y"))->id,
+                'user_id' => $request->user,
+                'address' => $request->address,
+            ]);
+        }
 
         return redirect('/jadwal-panen')->with('success-create', 'Jadwal Panen Bulanan telah ditambah!');
     }
@@ -90,38 +138,81 @@ class HarvestScheduleController extends Controller
         $users = User::role('PPL')->get();
         $months = Month::all();
         $sampleTypes = SampleType::all();
+        $subsegments = SubSegment::all();
 
-        return view('admin.edit-schedule', ['schedule' => $schedule, 'subdistricts' => $subdistricts, 'subdistricts' => $subdistricts, 'commodities' => $commodities, 'users' => $users, 'months' => $months, 'sampleTypes' => $sampleTypes]);
+        return view('admin.edit-schedule', [
+            'schedule' => $schedule,
+            'subdistricts' => $subdistricts,
+            'subdistricts' => $subdistricts,
+            'commodities' => $commodities,
+            'users' => $users,
+            'months' => $months,
+            'sampleTypes' => $sampleTypes,
+            'subsegments' => $subsegments
+        ]);
     }
     public function updateHarvestSchedule(Request $request, $id)
     {
-        $this->validate($request, [
-            'subdistrict' => 'required',
-            'village' => 'required',
-            'bs' => 'required',
-            'name' => 'required',
-            'nks' => 'required',
-            'sample_number' => 'required',
-            'commodity' => 'required',
-            'sample-type' => 'required',
-            'month' => 'required',
-            'user' => 'required',
-            'address' => 'required',
-        ]);
+        if ($request->commodity == null) {
+            $this->validate($request, [
+                'commodity' => 'required',
+            ]);
+        } else {
+            if ($request->commodity == 1) {
+                $this->validate($request, [
+                    'subdistrict' => 'required',
+                    'village' => 'required',
+                    'no_segment' => 'required',
+                    'subsegment' => 'required',
+                    'commodity' => 'required',
+                    'sample-type' => 'required',
+                    'month' => 'required',
+                    'user' => 'required',
+                ]);
+            } else {
+                $this->validate($request, [
+                    'subdistrict' => 'required',
+                    'village' => 'required',
+                    'bs' => 'required',
+                    'name' => 'required',
+                    'nks' => 'required',
+                    'sample_number' => 'required',
+                    'commodity' => 'required',
+                    'sample-type' => 'required',
+                    'month' => 'required',
+                    'user' => 'required',
+                    'address' => 'required',
+                ]);
+            }
+        }
 
         $schedule = MonthlySchedule::find($id);
-        $schedule->update([
-            'bs_id' => $request->bs,
-            'name' => $request->name,
-            'nks' => $request->nks,
-            'sample_number' => $request->sample_number,
-            'commodity_id' => $request->commodity,
-            'sample_type_id' => $request['sample-type'],
-            'month_id' => $request->month,
-            'year_id' => Year::firstWhere('name', date("Y"))->id,
-            'user_id' => $request->user,
-            'address' => $request->address,
-        ]);
+        if ($request->commodity == 1) {
+            $bscode = Village::find($request->village)->long_code . '001';
+            $schedule->update([
+                'bs_id' => Bs::where('long_code', 'like', '%' . $bscode . '%')->first()->id,
+                'commodity_id' => $request->commodity,
+                'sample_type_id' => $request['sample-type'],
+                'month_id' => $request->month,
+                'year_id' => Year::firstWhere('name', date("Y"))->id,
+                'user_id' => $request->user,
+                'segment' => $request->no_segment,
+                'subsegment_id' => $request->subsegment,
+            ]);
+        } else {
+            $schedule->update([
+                'bs_id' => $request->bs,
+                'name' => $request->name,
+                'nks' => $request->nks,
+                'sample_number' => $request->sample_number,
+                'commodity_id' => $request->commodity,
+                'sample_type_id' => $request['sample-type'],
+                'month_id' => $request->month,
+                'year_id' => Year::firstWhere('name', date("Y"))->id,
+                'user_id' => $request->user,
+                'address' => $request->address,
+            ]);
+        }
 
         return redirect('/jadwal-panen')->with('success-create', 'Jadwal Panen Bulanan telah diubah!');
     }
@@ -687,6 +778,33 @@ class HarvestScheduleController extends Controller
 
     function dashboard()
     {
-        return view('dashboard');
+        $currentMonth = Month::find(intval(date("m")));
+        $currentYear = Year::where(['name' => intval(date("Y"))])->first();
+        $schedules = MonthlySchedule::where(['month_id' => $currentMonth->id])->where(['year_id' => $currentYear->id])->get();
+        $commodities = Commodity::all();
+
+        $array = [];
+        foreach ($schedules as $schedule) {
+            if (!isset($array[$schedule->user->id])) {
+                $array[$schedule->user->id] = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0, 6 => 0];
+            }
+            $array[$schedule->user->id][$schedule->commodity->id] = $array[$schedule->user->id][$schedule->commodity->id] + 1;
+        }
+
+        $tableArray = [];
+        foreach ($array as $key => $value) {
+            $content = [];
+            foreach ($commodities as $commodity) {
+                $content[$commodity->name] = $value[$commodity->id];
+            }
+            $tableArray[] = array_merge(['name' => User::find($key)->name], $content);
+        }
+        // dd($tableArray);
+        return view('dashboard', [
+            'tableArray' => $tableArray,
+            'total_sample' => $schedules->count(),
+            'currentMonth' => $currentMonth,
+            'commodities' => $commodities
+        ]);
     }
 }

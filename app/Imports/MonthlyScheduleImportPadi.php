@@ -41,7 +41,7 @@ class MonthlyScheduleImportPadi implements ToModel, WithHeadingRow, SkipsEmptyRo
             'month_id' => Month::find($row['panen'])->id,
             'year_id' => Year::find($this->year)->id,
             'commodity_id' => 1,
-            'bs_id' => Bs::where(['long_code' => ($row['kode_kec'] . $row['kode_desa'] . '001B')])->first()->id,
+            'bs_id' => Bs::where('long_code', 'like', ('%' . $row['kode_kec'] . $row['kode_desa'] . '001%'))->first()->id,
             'address' => '',
             'name' => '',
             'nks' => 1,

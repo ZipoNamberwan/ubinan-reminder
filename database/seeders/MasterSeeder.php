@@ -4184,8 +4184,8 @@ class MasterSeeder extends Seeder
         SampleType::create(['name' => 'Utama']);
         SampleType::create(['name' => 'Cadangan']);
 
-        // MonthlySchedule::factory()->count(500)->create();
-        // HarvestSchedule::factory()->count(250)->create();
+        MonthlySchedule::factory()->count(500)->create();
+        HarvestSchedule::factory()->count(250)->create();
 
         Quote::create(['quote' => 'Kerja keraslah sampai tetangga berpikir rezekimu hasil dari pesugihan.']);
         Quote::create(['quote' => 'Masalah bisa membuat kita semakin dewasa, maka sering-seringlah bermasalah.']);

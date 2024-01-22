@@ -18,15 +18,10 @@
                     <h6 class="h2 text-white d-inline-block mb-0">Default</h6>
                     <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
                         <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
-                            <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
-                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
                             <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
                         </ol>
                     </nav>
-                </div>
-                <div class="col-lg-6 col-5 text-right">
-                    <a href="#" class="btn btn-sm btn-neutral">New</a>
-                    <a href="#" class="btn btn-sm btn-neutral">Filters</a>
                 </div>
             </div>
             <!-- Card stats -->
@@ -37,8 +32,8 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col">
-                                    <h5 class="card-title text-uppercase text-muted mb-0">Total traffic</h5>
-                                    <span class="h2 font-weight-bold mb-0">350,897</span>
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Total Sampel Bulan Ini</h5>
+                                    <span class="h2 font-weight-bold mb-0">{{$total_sample}}</span>
                                 </div>
                                 <div class="col-auto">
                                     <div class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
@@ -47,74 +42,7 @@
                                 </div>
                             </div>
                             <p class="mt-3 mb-0 text-sm">
-                                <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
-                                <span class="text-nowrap">Since last month</span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-md-6">
-                    <div class="card card-stats">
-                        <!-- Card body -->
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col">
-                                    <h5 class="card-title text-uppercase text-muted mb-0">New users</h5>
-                                    <span class="h2 font-weight-bold mb-0">2,356</span>
-                                </div>
-                                <div class="col-auto">
-                                    <div class="icon icon-shape bg-gradient-orange text-white rounded-circle shadow">
-                                        <i class="ni ni-chart-pie-35"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="mt-3 mb-0 text-sm">
-                                <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
-                                <span class="text-nowrap">Since last month</span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-md-6">
-                    <div class="card card-stats">
-                        <!-- Card body -->
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col">
-                                    <h5 class="card-title text-uppercase text-muted mb-0">Sales</h5>
-                                    <span class="h2 font-weight-bold mb-0">924</span>
-                                </div>
-                                <div class="col-auto">
-                                    <div class="icon icon-shape bg-gradient-green text-white rounded-circle shadow">
-                                        <i class="ni ni-money-coins"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="mt-3 mb-0 text-sm">
-                                <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
-                                <span class="text-nowrap">Since last month</span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-md-6">
-                    <div class="card card-stats">
-                        <!-- Card body -->
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col">
-                                    <h5 class="card-title text-uppercase text-muted mb-0">Performance</h5>
-                                    <span class="h2 font-weight-bold mb-0">49,65%</span>
-                                </div>
-                                <div class="col-auto">
-                                    <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
-                                        <i class="ni ni-chart-bar-32"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="mt-3 mb-0 text-sm">
-                                <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
-                                <span class="text-nowrap">Since last month</span>
+                                <span class="text-nowrap">{{$currentMonth->name}}</span>
                             </p>
                         </div>
                     </div>
@@ -126,26 +54,6 @@
 
 <div class="container-fluid mt--6">
 
-    @if (session('success-edit') || session('success-create'))
-    <div class="alert alert-primary alert-dismissible fade show" role="alert">
-        <span class="alert-icon"><i class="fas fa-check-circle"></i></span>
-        <span class="alert-text"><strong>Sukses! </strong>{{ session('success-create') }} {{ session('success-edit') }}</span>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">×</span>
-        </button>
-    </div>
-    @endif
-
-    @if (session('success-delete'))
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <span class="alert-icon"><i class="fas fa-check-circle"></i></span>
-        <span class="alert-text"><strong>Sukses! </strong>{{ session('success-delete') }}</span>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">×</span>
-        </button>
-    </div>
-    @endif
-
     <div class="row">
         <div class="col">
             <div class="card-wrapper">
@@ -155,13 +63,32 @@
                     <div class="card-header pb-0">
                         <div class="row mb-3">
                             <div class="col-md-7">
-                                <h3>Dashboard</h3>
+                                <h3>Rekap Sampel Per Petugas Bulan {{$currentMonth->name}}</h3>
                             </div>
                         </div>
                     </div>
                     <!-- Card body -->
                     <div class="card-body">
-                        
+                        <table class="table" id="datatable-id" width="100%">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Nama Petugas</th>
+                                    @foreach($commodities as $commodity)
+                                    <th>{{$commodity->name}}</th>
+                                    @endforeach
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($tableArray as $arr)
+                                <tr>
+                                    <td>{{$arr['name']}}</td>
+                                    @foreach($commodities as $commodity)
+                                    <td>{{$arr[$commodity->name]}}</td>
+                                    @endforeach
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

@@ -45,7 +45,7 @@
                             <div class="row">
                                 <div class="col-md-4 mt-3">
                                     <label class="form-control-label">Komoditas <span class="text-danger">*</span></label>
-                                    <select id="commodity" name="commodity" class="form-control" data-toggle="select" required>
+                                    <select onchange="onCommodityChange()" id="commodity" name="commodity" class="form-control" data-toggle="select" required>
                                         <option value="0" disabled selected> -- Pilih Komoditas -- </option>
                                         @foreach ($commodities as $commodity)
                                         <option value="{{ $commodity->id }}" {{ old('commodity') == $commodity->id ? 'selected' : '' }}>
@@ -87,9 +87,9 @@
                                     </div>
                                     @enderror
                                 </div>
-                                <div class="col-md-4 mt-3">
+                                <div id="bs_div" class="col-md-4 mt-3">
                                     <label class="form-control-label">Blok Sensus <span class="text-danger">*</span></label>
-                                    <select id="bs" name="bs" class="form-control" data-toggle="select" name="bs">
+                                    <select id="bs" name="bs" class="form-control" data-toggle="select">
                                     </select>
                                     @error('bs')
                                     <div class="text-valid mt-2">
@@ -99,38 +99,70 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-4 mt-3">
+                                <div id="no_segment" class="col-md-4 mt-3">
+                                    <label class="form-control-label" for="no_segment">No Segment <span class="text-danger">*</span></label>
+                                    <input type="number" name="no_segment" class="form-control @error('no_segment') is-invalid @enderror" value="{{ @old('no_segment') }}">
+                                    @error('no_segment')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                    @enderror
+                                </div>
+                                <div id="subsegment" class="col-md-4 mt-3">
+                                    <label class="form-control-label">Sub Segment <span class="text-danger">*</span></label>
+                                    <select name="subsegment" class="form-control" data-toggle="select" required>
+                                        <option value="0" disabled selected> -- Pilih Sub Segment -- </option>
+                                        @foreach ($subsegments as $subsegment)
+                                        <option value="{{ $subsegment->id }}" {{ old('subsegment') == $subsegment->id ? 'selected' : '' }}>
+                                            {{ $subsegment->code}}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                    @error('subsegment')
+                                    <div class="text-valid mt-2">
+                                        {{ $message }}
+                                    </div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div id="nks" class="col-md-4 mt-3">
                                     <label class="form-control-label" for="nks">NKS <span class="text-danger">*</span></label>
-                                    <input type="number" name="nks" class="form-control @error('nks') is-invalid @enderror" id="validationCustom03" value="{{ @old('nks') }}">
+                                    <input type="number" name="nks" class="form-control @error('nks') is-invalid @enderror" value="{{ @old('nks') }}">
                                     @error('nks')
                                     <div class="invalid-feedback">
                                         {{ $message }}
                                     </div>
                                     @enderror
                                 </div>
-                                <div class="col-md-4 mt-3">
+                                <div id="sample_number" class="col-md-4 mt-3">
                                     <label class="form-control-label" for="sample_number">Nomor Sampel <span class="text-danger">*</span></label>
-                                    <input type="number" name="sample_number" class="form-control @error('sample_number') is-invalid @enderror" id="validationCustom03" value="{{ @old('sample_number') }}">
+                                    <input type="number" name="sample_number" class="form-control @error('sample_number') is-invalid @enderror" value="{{ @old('sample_number') }}">
                                     @error('sample_number')
                                     <div class="invalid-feedback">
                                         {{ $message }}
                                     </div>
                                     @enderror
                                 </div>
-                                <div class="col-md-4 mt-3">
+                                <div id="name" class="col-md-4 mt-3">
                                     <label class="form-control-label" for="name">Nama Responden <span class="text-danger">*</span></label>
-                                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" id="validationCustom03" value="{{ @old('name') }}">
+                                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ @old('name') }}">
                                     @error('name')
                                     <div class="invalid-feedback">
                                         {{ $message }}
                                     </div>
                                     @enderror
                                 </div>
-                                <div class="col-md-4 mt-3">
+                                <div id="address" class="col-md-4 mt-3">
                                     <div class="form-group">
                                         <label class="form-control-label" for="address">Alamat <span class="text-danger">*</span></label>
-                                        <textarea class="form-control" id="address" name="address" rows="4">{{old('address')}}</textarea>
+                                        <textarea class="form-control" name="address" rows="4">{{old('address')}}</textarea>
                                     </div>
+                                    @error('address')
+                                    <div class="text-valid mt-2">
+                                        {{ $message }}
+                                    </div>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="row">
@@ -144,7 +176,7 @@
                                         </option>
                                         @endforeach
                                     </select>
-                                    @error('sampleType')
+                                    @error('sample-type')
                                     <div class="text-valid mt-2">
                                         {{ $message }}
                                     </div>
@@ -267,6 +299,35 @@
             }
         });
     }
+</script>
+
+<script>
+    function onCommodityChange() {
+        var e = document.getElementById("commodity");
+        var value = e.value;
+        if (value == 1) {
+            document.getElementById("bs_div").style.display = 'none'
+            document.getElementById("nks").style.display = 'none'
+            document.getElementById("sample_number").style.display = 'none'
+            document.getElementById("name").style.display = 'none'
+            document.getElementById("address").style.display = 'none'
+
+            document.getElementById("subsegment").style.display = 'block'
+            document.getElementById("no_segment").style.display = 'block'
+        } else {
+            document.getElementById("bs_div").style.display = 'block'
+            document.getElementById("nks").style.display = 'block'
+            document.getElementById("sample_number").style.display = 'block'
+            document.getElementById("name").style.display = 'block'
+            document.getElementById("address").style.display = 'block'
+
+            document.getElementById("subsegment").style.display = 'none'
+            document.getElementById("no_segment").style.display = 'none'
+        }
+
+    }
+
+    onCommodityChange()
 </script>
 
 @if(@old("subdistrict"))

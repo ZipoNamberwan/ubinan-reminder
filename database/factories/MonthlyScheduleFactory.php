@@ -32,6 +32,8 @@ class MonthlyScheduleFactory extends Factory
             'year_id' => 2,
             'user_id' => fake()->randomElement([3, 4, 6, 7]),
             'address' => fake()->name(),
+            'segment' => fake()->numberBetween(1, 99),
+            'subsegment_id' => fake()->numberBetween(1, 9),
         ];
     }
 }
