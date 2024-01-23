@@ -32,7 +32,7 @@ class SentMessageController extends Controller
             'message' => 'required',
             'phone_number' => 'required',
             'role' => 'required',
-            'ids' => 'required'
+            // 'ids' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -47,15 +47,17 @@ class SentMessageController extends Controller
         ]);
 
         if ($request->role == "PPL") {
+            $ids = json_decode($request->ids);
             if ($request->type == "monthly") {
-                foreach ($request->ids as $id) {
+                foreach ($ids as $id) {
                     $schedule = MonthlySchedule::find($id);
                     $schedule->update(['reminder_num' => $schedule->reminder_num + 1]);
                 }
             } else {
-                foreach ($request->ids as $id) {
-                    $schedule = HarvestSchedule::find($id);
-                    $schedule->update(['reminder_num' => $schedule->reminder_num + 1]);
+                foreach ($ids as $id) {
+                    $schedule = MonthlySchedule::find($id);
+                    $harvestSchedule = HarvestSchedule::find($schedule->harvestSchedule->id);
+                    $harvestSchedule->update(['reminder_num' => $schedule->reminder_num + 1]);
                 }
             }
         }
@@ -76,7 +78,11 @@ class SentMessageController extends Controller
 
         $recordsTotal = SentMessages::all()->count();
         if ($user->hasRole('PML')) {
-            $recordsTotal = SentMessages::whereIn('receiver_id', $user->getPPLs->pluck('id'))->count();
+            $phone_numbers = [];
+            foreach ($user->getPPLs->pluck('phone_number') as $phone) {
+                $phone_numbers[] = '+62' . $phone;
+            }
+            $recordsTotal = SentMessages::whereIn('phone_number', $phone_numbers)->count();
         }
 
         $orderColumn = 'created_at';
@@ -99,7 +105,11 @@ class SentMessageController extends Controller
         $searchkeyword = $request->search['value'];
         $messages = SentMessages::all();
         if ($user->hasRole('PML')) {
-            $messages = SentMessages::whereIn('receiver_id', $user->getPPLs->pluck('id'))->get();
+            $phone_numbers = [];
+            foreach ($user->getPPLs->pluck('phone_number') as $phone) {
+                $phone_numbers[] = '+62' . $phone;
+            }
+            $messages = SentMessages::whereIn('phone_number', $phone_numbers)->get();
         }
 
         if ($searchkeyword != null) {
@@ -131,7 +141,7 @@ class SentMessageController extends Controller
             $messageData["index"] = $i;
             $messageData["id"] = $message->id;
             $messageData["receiver"] = $message->receiver;
-            $messageData["phone_number"] = '+62' . $message->phone_number;
+            $messageData["phone_number"] = $message->phone_number;
             $messageData["message"] = $message->message;
             $messageData["time"] = $message->created_at != null ? date_format($message->created_at, "d M Y H:i") : null;
             $messagesArray[] = $messageData;

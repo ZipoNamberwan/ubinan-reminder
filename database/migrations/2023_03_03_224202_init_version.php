@@ -108,7 +108,7 @@ return new class extends Migration
             $table->id();
             $table->string('phone_number');
             $table->string('receiver');
-            $table->string('message');
+            $table->longText('message');
             $table->enum('type', ['monthly', 'harvest']);
             $table->timestamps();
         });

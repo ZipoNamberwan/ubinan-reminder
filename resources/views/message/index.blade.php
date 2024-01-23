@@ -98,6 +98,12 @@
                 "responsivePriority": 1,
                 "width": "15%",
                 "data": "message",
+                "render": function(data, type, row) {
+                    if (type === 'display') {
+                        return '<textarea disabled class="form-control" id="exampleFormControlTextarea1" rows="15">' + data + '</textarea>'
+                    }
+                    return data;
+                }
             },
             {
                 "responsivePriority": 1,
