@@ -426,7 +426,7 @@ class HarvestScheduleController extends Controller
         $startrow++;
 
         foreach ($schedules as $schedule) {
-            if ($schedule->commodity->id != 1) {
+            if ($schedule->commodity->id == 1) {
                 $activeWorksheet->setCellValueExplicit('A' . $startrow, $schedule->bs->village->subdistrict->code, DataType::TYPE_STRING);
                 $activeWorksheet->setCellValueExplicit('B' . $startrow, $schedule->bs->village->short_code, DataType::TYPE_STRING);
                 $activeWorksheet->setCellValueExplicit('C' . $startrow, sprintf('%02d', $schedule->segment), DataType::TYPE_STRING);
