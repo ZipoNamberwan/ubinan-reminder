@@ -60,7 +60,7 @@ return new class extends Migration
 
         Schema::create('monthly_schedules', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('user_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('month_id')->constrained('months');
             $table->foreignId('year_id')->constrained('years');
             $table->foreignId('commodity_id')->constrained('commodities');
@@ -72,7 +72,7 @@ return new class extends Migration
 
             $table->integer('segment')->nullable();
             $table->foreignId('subsegment_id')->nullable()->constrained('subsegments');
-            
+
             $table->foreignId('sample_type_id')->constrained('sample_types');
             $table->integer('reminder_num')->default(0);
             $table->timestamps();

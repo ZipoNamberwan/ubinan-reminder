@@ -41,19 +41,19 @@
                     <!-- Card body -->
                     <div class="card-body">
                         <form id="formupdate" autocomplete="off" method="post" action="/users/{{$user->id}}" class="needs-validation" enctype="multipart/form-data" novalidate>
-                        @method('put')    
-                        @csrf
+                            @method('put')
+                            @csrf
                             <div class="row">
                                 <div class="col-md-6 mt-3">
                                     <label class="form-control-label" for="role">Peran <span class="text-danger">*</span></label>
                                     <div class="custom-control custom-radio mb-3">
-                                        <input onchange="onChangeRole('PPL')" name="role" class="custom-control-input" id="rolePPL" value="PPL" type="radio" {{ old('role', $user->roles[0]->name) == 'PPL' ? 'checked' : '' }}>
+                                        <input onchange="onChangeRole('PPL')" name="role" class="custom-control-input" id="rolePPL" value="PPL" type="radio" {{ old('role', count($user->roles) > 0 ? $user->roles[0]->name : null) == 'PPL' ? 'checked' : '' }}>
                                         <label class="custom-control-label" for="rolePPL">
                                             Pencacah Lapangan
                                         </label>
                                     </div>
                                     <div class="custom-control custom-radio mb-3">
-                                        <input onchange="onChangeRole('PML')" name="role" class="custom-control-input" id="rolePML" value="PML" type="radio" {{ old('role', $user->roles[0]->name) == 'PML' ? 'checked' : '' }}>
+                                        <input onchange="onChangeRole('PML')" name="role" class="custom-control-input" id="rolePML" value="PML" type="radio" {{ old('role', count($user->roles) > 0 ? $user->roles[0]->name : null) == 'PML' ? 'checked' : '' }}>
                                         <label class="custom-control-label" for="rolePML">
                                             Pengawas Lapangan
                                         </label>
@@ -158,11 +158,11 @@
     function onChangeRole(role) {
         if (role === 'PPL') {
             document.getElementById('supervisor').disabled = false;
-        } else {
+        } else if (role === 'PML') {
             document.getElementById('supervisor').disabled = true;
         }
     }
 
-    onChangeRole('{{$user->roles[0]->name}}')
+    onChangeRole('{{count($user->roles) > 0 ? $user->roles[0]->name : "abscdefghi"}} ')
 </script>
 @endsection

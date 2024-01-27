@@ -50,6 +50,16 @@
     </div>
     @endif
 
+    @if (session('error-delete'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span class="alert-icon"><i class="fas fa-check-circle"></i></span>
+        <span class="alert-text"><strong>Gagal! </strong>{{ session('error-delete') }}</span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">×</span>
+        </button>
+    </div>
+    @endif
+
     <div class="row">
         <div class="col">
             <div class="card-wrapper">
@@ -159,7 +169,7 @@
         event.preventDefault();
         Swal.fire({
             title: 'Yakin Hapus Pengguna Ini?',
-            text: name,
+            text: name + ". Menghapus pengguna akan menghapus juga jadwal bulanan yang terkait dengan pengguna tersebut",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',

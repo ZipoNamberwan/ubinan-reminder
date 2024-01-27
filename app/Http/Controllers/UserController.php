@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -126,7 +127,16 @@ class UserController extends Controller
         if ($id == 1) {
             return abort(403);
         }
-        User::destroy($id);
+        if (count(User::find($id)->getPPLs) > 0) {
+            return redirect('/users')->with('error-delete', 'Gagal menghapus pengguna, karena masih punya PPL');
+        } else {
+            try {
+                User::destroy($id);
+            } catch (QueryException $e) {
+                return redirect('/users')->with('error-delete', 'Gagal menghapus pengguna, karena masih punya PPL');
+            }
+        }
+
         return redirect('/users')->with('success-delete', 'Pengguna telah dihapus!');
     }
 
@@ -183,7 +193,7 @@ class UserController extends Controller
             $userData["name"] = $user->name;
             $userData["email"] = $user->email;
             $userData["phone_number"] = '+62' . $user->phone_number;
-            $userData["role"] = $user->roles->first()->name;
+            $userData["role"] = count($user->roles) > 0 ? $user->roles->first()->name : '';
             $userData["supervisor_id"] = $user->getPML != null ? $user->getPML->id : '';
             $userData["supervisor_name"] = $user->getPML != null ? $user->getPML->name : '';
             $usersArray[] = $userData;
