@@ -94,24 +94,39 @@ class UserController extends Controller
     {
         $user = User::find($id);
 
-        $this->validate($request, [
-            'name' => 'required',
-            // 'email' => 'required|email|unique:users,email,' . $user->id,
-            'role' => 'required',
-            'phone_number' => 'required|unique:users,phone_number',
-            'password' => 'required',
-            'supervisor' => 'required_if:role,PPL'
-        ]);
+        if ($id != 1) {
+            $this->validate($request, [
+                'name' => 'required',
+                // 'email' => 'required|email|unique:users,email,' . $user->id,
+                'role' => 'required',
+                'phone_number' => 'required',
+                'password' => 'required',
+                'supervisor' => 'required_if:role,PPL'
+            ]);
 
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->phone_number,
-            'password' => $request->password != $user->password ?  bcrypt($request->password) : $user->password,
-            'supervisor_id' => $request->role == 'PPL' ? $request->supervisor : null,
-            'phone_number' => $request->phone_number,
-        ]);
-        $user->removeRole($user->roles[0]->name);
-        $user->assignRole($request->role);
+            $user->update([
+                'name' => $request->name,
+                'email' => $request->phone_number,
+                'password' => $request->password != $user->password ?  bcrypt($request->password) : $user->password,
+                'supervisor_id' => $request->role == 'PPL' ? $request->supervisor : null,
+                'phone_number' => $request->phone_number,
+            ]);
+            $user->removeRole($user->roles[0]->name);
+            $user->assignRole($request->role);
+        } else {
+            $this->validate($request, [
+                'name' => 'required',
+                'phone_number' => 'required',
+                'password' => 'required',
+            ]);
+
+            $user->update([
+                'name' => $request->name,
+                'email' => $request->phone_number,
+                'password' => $request->password != $user->password ?  bcrypt($request->password) : $user->password,
+                'phone_number' => $request->phone_number,
+            ]);
+        }
 
         return redirect('/users')->with('success-create', 'Pengguna telah diubah!');
     }

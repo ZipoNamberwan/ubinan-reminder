@@ -43,6 +43,7 @@
                         <form id="formupdate" autocomplete="off" method="post" action="/users/{{$user->id}}" class="needs-validation" enctype="multipart/form-data" novalidate>
                             @method('put')
                             @csrf
+                            @if($user->id != 1)
                             <div class="row">
                                 <div class="col-md-6 mt-3">
                                     <label class="form-control-label" for="role">Peran <span class="text-danger">*</span></label>
@@ -65,6 +66,7 @@
                                     @enderror
                                 </div>
                             </div>
+                            @endif
                             <div class="row">
                                 <div class="col-md-6 mt-3">
                                     <label class="form-control-label" for="name">Nama <span class="text-danger">*</span></label>
@@ -109,6 +111,7 @@
                                     @enderror
                                 </div>
                             </div>
+                            @if($user->id != 1)
                             <div class="row">
                                 <div class="col-md-6 mt-3">
                                     <label class="form-control-label">Pengawas <span class="text-danger">*</span></label>
@@ -127,6 +130,7 @@
                                     @enderror
                                 </div>
                             </div>
+                            @endif
                             <div class="row">
                                 <div class="col-md-6 mt-3 mb-3">
                                     <label class="form-control-label" for="password">Password <span class="text-danger">*</span>
