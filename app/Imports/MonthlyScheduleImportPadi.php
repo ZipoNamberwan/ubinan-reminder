@@ -17,12 +17,15 @@ use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Validators\Failure;
 
 class MonthlyScheduleImportPadi implements ToModel, WithHeadingRow, SkipsEmptyRows, WithBatchInserts, WithValidation, WithMultipleSheets
 {
 
     public $year;
     public $subround;
+
+    private $rowNum = 1;
 
     public function __construct($year, $subround)
     {
@@ -36,12 +39,23 @@ class MonthlyScheduleImportPadi implements ToModel, WithHeadingRow, SkipsEmptyRo
      */
     public function model(array $row)
     {
+        $this->rowNum++;
+
+        $bs = Bs::where('long_code', 'like', ('%' . $row['kode_kec'] . $row['kode_desa'] . '001%'))->first();
+        if ($bs == null) {
+            $error = ['Kombinasi kode kec, desa dan BS tidak ditemukan' => 'Kombinasi kode kec, desa dan BS tidak ditemukan'];
+            $failures[] = new Failure($this->rowNum, 'Kombinasi kode kec, desa dan BS tidak ditemukan', $error, $row);
+            throw new \Maatwebsite\Excel\Validators\ValidationException(
+                \Illuminate\Validation\ValidationException::withMessages($error),
+                $failures
+            );
+        }
         return new MonthlySchedule([
             'user_id' => User::where(['email' => $row['no_hp']])->first()->id,
             'month_id' => Month::find($row['panen'])->id,
             'year_id' => Year::find($this->year)->id,
             'commodity_id' => 1,
-            'bs_id' => Bs::where('long_code', 'like', ('%' . $row['kode_kec'] . $row['kode_desa'] . '001%'))->first()->id,
+            'bs_id' => $bs->id,
             'address' => '',
             'name' => '',
             'nks' => 1,

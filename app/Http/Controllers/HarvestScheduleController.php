@@ -243,7 +243,7 @@ class HarvestScheduleController extends Controller
             $recordsTotal = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->where('user_id', $user->id)->count();
         }
 
-        $orderColumn = 'id_bs';
+        $orderColumn = 'month_id';
         $orderDir = 'desc';
         if ($request->order != null) {
             if ($request->order[0]['dir'] == 'asc') {
@@ -251,16 +251,20 @@ class HarvestScheduleController extends Controller
             } else {
                 $orderDir = 'desc';
             }
-            if ($request->order[0]['column'] == '1') {
-                $orderColumn = 'id_bs';
+            if ($request->order[0]['column'] == '0') {
+                $orderColumn = 'bs_id';
             } else if ($request->order[0]['column'] == '2') {
                 $orderColumn = 'commodity_id';
             } else if ($request->order[0]['column'] == '3') {
                 $orderColumn = 'month_id';
             } else if ($request->order[0]['column'] == '4') {
-                $orderColumn = 'sampel_type_id';
-            } else if ($request->order[0]['column'] == '5') {
                 $orderColumn = 'user_id';
+            } else if ($request->order[0]['column'] == '5') {
+                $orderColumn = 'month_id';
+            } else if ($request->order[0]['column'] == '6') {
+                $orderColumn = 'reminder_num';
+            } else if ($request->order[0]['column'] == '7') {
+                $orderColumn = 'month_id';
             }
         }
 
@@ -298,6 +302,10 @@ class HarvestScheduleController extends Controller
             $schedule = $schedule->skip($request->start)
                 ->take($request->length);
         }
+
+
+
+        // dd($request->order);
 
         $scheduleArray = array();
         $i = $request->start + 1;
@@ -357,7 +365,7 @@ class HarvestScheduleController extends Controller
         }
 
         $spreadsheet = new Spreadsheet();
-        $activeWorksheet = $spreadsheet->getActiveSheet();
+        $activeWorksheet = $spreadsheet->getActiveSheet()->setTitle("Palawija");
 
         $startrow = 1;
         $activeWorksheet->setCellValue('A' . $startrow, 'Kode Kecamatan');
@@ -374,26 +382,65 @@ class HarvestScheduleController extends Controller
         $activeWorksheet->setCellValue('L' . $startrow, 'Jumlah Reminder Panen Terkirim');
         $activeWorksheet->setCellValue('M' . $startrow, 'Jenis Sampel');
         $activeWorksheet->setCellValue('N' . $startrow, 'Petugas');
-        $activeWorksheet->setCellValue('O' . $startrow, 'Email Petugas');
+        $activeWorksheet->setCellValue('O' . $startrow, 'NO HP Petugas');
         $startrow++;
 
         foreach ($schedules as $schedule) {
-            $activeWorksheet->setCellValueExplicit('A' . $startrow, $schedule->bs->village->subdistrict->code, DataType::TYPE_STRING);
-            $activeWorksheet->setCellValueExplicit('B' . $startrow, $schedule->bs->village->short_code, DataType::TYPE_STRING);
-            $activeWorksheet->setCellValue('C' . $startrow, $schedule->bs->short_code);
-            $activeWorksheet->setCellValueExplicit('D' . $startrow, $schedule->nks, DataType::TYPE_STRING);
-            $activeWorksheet->setCellValue('E' . $startrow, $schedule->sample_number);
-            $activeWorksheet->setCellValue('F' . $startrow, $schedule->name);
-            $activeWorksheet->setCellValue('G' . $startrow, $schedule->address);
-            $activeWorksheet->setCellValue('H' . $startrow, $schedule->commodity->name);
-            $activeWorksheet->setCellValue('I' . $startrow, $schedule->month->name);
-            $activeWorksheet->setCellValue('J' . $startrow, $schedule->reminder_num);
-            $activeWorksheet->setCellValue('K' . $startrow, $schedule->harvestSchedule != null ? $schedule->harvestSchedule->date : null);
-            $activeWorksheet->setCellValue('L' . $startrow, $schedule->harvestSchedule != null ? $schedule->harvestSchedule->reminder_num : null);
-            $activeWorksheet->setCellValue('M' . $startrow, $schedule->sampleType->name);
-            $activeWorksheet->setCellValue('N' . $startrow, $schedule->user->name);
-            $activeWorksheet->setCellValue('O' . $startrow, $schedule->user->email);
-            $startrow++;
+            if ($schedule->commodity->id != 1) {
+                $activeWorksheet->setCellValueExplicit('A' . $startrow, $schedule->bs->village->subdistrict->code, DataType::TYPE_STRING);
+                $activeWorksheet->setCellValueExplicit('B' . $startrow, $schedule->bs->village->short_code, DataType::TYPE_STRING);
+                $activeWorksheet->setCellValue('C' . $startrow, $schedule->bs->short_code);
+                $activeWorksheet->setCellValueExplicit('D' . $startrow, $schedule->nks, DataType::TYPE_STRING);
+                $activeWorksheet->setCellValue('E' . $startrow, $schedule->sample_number);
+                $activeWorksheet->setCellValue('F' . $startrow, $schedule->name);
+                $activeWorksheet->setCellValue('G' . $startrow, $schedule->address);
+                $activeWorksheet->setCellValue('H' . $startrow, $schedule->commodity->name);
+                $activeWorksheet->setCellValue('I' . $startrow, $schedule->month->name);
+                $activeWorksheet->setCellValue('J' . $startrow, $schedule->reminder_num);
+                $activeWorksheet->setCellValue('K' . $startrow, $schedule->harvestSchedule != null ? $schedule->harvestSchedule->date : null);
+                $activeWorksheet->setCellValue('L' . $startrow, $schedule->harvestSchedule != null ? $schedule->harvestSchedule->reminder_num : null);
+                $activeWorksheet->setCellValue('M' . $startrow, $schedule->sampleType->name);
+                $activeWorksheet->setCellValue('N' . $startrow, $schedule->user->name);
+                $activeWorksheet->setCellValueExplicit('O' . $startrow, '+62' . $schedule->user->email, DataType::TYPE_STRING);
+                $startrow++;
+            }
+        }
+
+        $spreadsheet->createSheet();
+        $spreadsheet->setActiveSheetIndex(1);
+        $activeWorksheet = $spreadsheet->getActiveSheet()->setTitle("Padi");
+
+        $startrow = 1;
+        $activeWorksheet->setCellValue('A' . $startrow, 'Kode Kecamatan');
+        $activeWorksheet->setCellValue('B' . $startrow, 'Kode Desa');
+        $activeWorksheet->setCellValue('C' . $startrow, 'Kode Segmen');
+        $activeWorksheet->setCellValue('D' . $startrow, 'Subsegmen');
+        $activeWorksheet->setCellValue('E' . $startrow, 'Komoditas');
+        $activeWorksheet->setCellValue('F' . $startrow, 'Bulan Panen');
+        $activeWorksheet->setCellValue('G' . $startrow, 'Jumlah Reminder Bulan Panen Terkirim');
+        $activeWorksheet->setCellValue('H' . $startrow, 'Perkiraan Tanggal Panen');
+        $activeWorksheet->setCellValue('I' . $startrow, 'Jumlah Reminder Panen Terkirim');
+        $activeWorksheet->setCellValue('J' . $startrow, 'Jenis Sampel');
+        $activeWorksheet->setCellValue('K' . $startrow, 'Petugas');
+        $activeWorksheet->setCellValue('L' . $startrow, 'No HP Petugas');
+        $startrow++;
+
+        foreach ($schedules as $schedule) {
+            if ($schedule->commodity->id != 1) {
+                $activeWorksheet->setCellValueExplicit('A' . $startrow, $schedule->bs->village->subdistrict->code, DataType::TYPE_STRING);
+                $activeWorksheet->setCellValueExplicit('B' . $startrow, $schedule->bs->village->short_code, DataType::TYPE_STRING);
+                $activeWorksheet->setCellValueExplicit('C' . $startrow, sprintf('%02d', $schedule->segment), DataType::TYPE_STRING);
+                $activeWorksheet->setCellValue('D' . $startrow, $schedule->subSegment->code);
+                $activeWorksheet->setCellValue('E' . $startrow, $schedule->commodity->name);
+                $activeWorksheet->setCellValue('F' . $startrow, $schedule->month->name);
+                $activeWorksheet->setCellValue('G' . $startrow, $schedule->reminder_num);
+                $activeWorksheet->setCellValue('H' . $startrow, $schedule->harvestSchedule != null ? $schedule->harvestSchedule->date : null);
+                $activeWorksheet->setCellValue('I' . $startrow, $schedule->harvestSchedule != null ? $schedule->harvestSchedule->reminder_num : null);
+                $activeWorksheet->setCellValue('J' . $startrow, $schedule->sampleType->name);
+                $activeWorksheet->setCellValue('K' . $startrow, $schedule->user->name);
+                $activeWorksheet->setCellValueExplicit('L' . $startrow, '+62' . $schedule->user->email, DataType::TYPE_STRING);
+                $startrow++;
+            }
         }
 
         $writer = new Xlsx($spreadsheet);

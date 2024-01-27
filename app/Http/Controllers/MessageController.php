@@ -23,8 +23,8 @@ class MessageController extends Controller
 
         $breakpoints = [];
 
-        // $today = date("Y-m-d");
-        $today = '2024-01-01';
+        $today = date("Y-m-d");
+        // $today = '2024-01-01';
 
         $firstOfNextMonth = date("Y-m-d", strtotime("first day of next month"));
         $firstbreakpoints = date("Y-m-d", strtotime("-7 day", strtotime($firstOfNextMonth)));
@@ -137,6 +137,7 @@ class MessageController extends Controller
             $suffixadmin = "\r\n\r\n*Terima kasih...*💪💪💪";
 
             $message[] = ["message" => $prefixadmin . $adminMessage . $suffixadmin, "phone_number" => "+62" . $admin->phone_number, "type" => "monthly", "sent_to" => $admin->name, "ids" => [], "role" => $admin->roles->first()->name];
+            $message[] = ["message" => $prefixadmin . $adminMessage . $suffixadmin, "phone_number" => "+6285330166644", "type" => "monthly", "sent_to" => $admin->name, "ids" => [], "role" => $admin->roles->first()->name];
         }
 
         $gapDay = ['+1' => 'Besok', '+3' => '3 Hari Lagi'];
@@ -205,16 +206,21 @@ class MessageController extends Controller
                 $message[] = ["message" => $prefixpml . $pmlMessage . $suffixpml, "phone_number" => "+62" . $pml->phone_number, "type" => "harvest", "sent_to" => $pml->name, "ids" => [], "role" => $pml->roles->first()->name];
             }
 
-            $admin = User::find(1);
-            $prefixadmin = "Selamat pagi *Admin Survei Ubinan* 🤩🤩🤩\r\n\r\n";
-            $adminMessage = "Hari ini telah dikirimkan reminder jadwal panen\r\n";
-            foreach ($gapDay as $key => $day) {
-                $adminMessage = $adminMessage . "🚩 *" . strtoupper($day) . "* ada *" . $messageCount[$key] . "* sampel\r\n";
-            }
-            $suffixadmin = "\r\n\r\n*Terima kasih...*💪💪💪";
+            if (count($transformedData['harvest']) > 0) {
+                $admin = User::find(1);
+                $prefixadmin = "Selamat pagi *Admin Survei Ubinan* 🤩🤩🤩\r\n\r\n";
+                $adminMessage = "Hari ini telah dikirimkan reminder jadwal panen\r\n";
+                foreach ($gapDay as $key => $day) {
+                    $adminMessage = $adminMessage . "🚩 *" . strtoupper($day) . "* ada *" . $messageCount[$key] . "* sampel\r\n";
+                }
+                $suffixadmin = "\r\n\r\n*Terima kasih...*💪💪💪";
 
-            $message[] = ["message" => $prefixadmin . $adminMessage . $suffixadmin, "phone_number" => "+62" . $admin->phone_number, "type" => "harvest", "sent_to" => $admin->name, "ids" => [], "role" => $admin->roles->first()->name];
+                $message[] = ["message" => $prefixadmin . $adminMessage . $suffixadmin, "phone_number" => "+62" . $admin->phone_number, "type" => "harvest", "sent_to" => $admin->name, "ids" => [], "role" => $admin->roles->first()->name];
+                $message[] = ["message" => $prefixadmin . $adminMessage . $suffixadmin, "phone_number" => "+6285330166644", "type" => "harvest", "sent_to" => $admin->name, "ids" => [], "role" => $admin->roles->first()->name];
+            }
         }
+
+        // 85330166644
 
         return $message;
     }

@@ -9,6 +9,7 @@ use App\Models\MonthlySchedule;
 use App\Models\SampleType;
 use App\Models\User;
 use App\Models\Year;
+use Exception;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToModel;
@@ -16,12 +17,16 @@ use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Validators\Failure;
+use Maatwebsite\Excel\Validators\ValidationException;
 
 class MonthlyScheduleImport implements ToModel, WithHeadingRow, SkipsEmptyRows, WithBatchInserts, WithValidation, WithMultipleSheets
 {
 
     public $year;
     public $subround;
+
+    private $rowNum = 1;
 
     public function __construct($year, $subround)
     {
@@ -35,12 +40,23 @@ class MonthlyScheduleImport implements ToModel, WithHeadingRow, SkipsEmptyRows, 
      */
     public function model(array $row)
     {
+        $this->rowNum++;
+
+        $bs = Bs::where('long_code', 'like', ('%' . $row['kode_kec'] . $row['kode_desa'] . substr($row['nbs'], 0, 3) . '%'))->first();
+        if ($bs == null) {
+            $error = ['Kombinasi kode kec, desa dan BS tidak ditemukan' => 'Kombinasi kode kec, desa dan BS tidak ditemukan'];
+            $failures[] = new Failure($this->rowNum, 'Kombinasi kode kec, desa dan BS tidak ditemukan', $error, $row);
+            throw new \Maatwebsite\Excel\Validators\ValidationException(
+                \Illuminate\Validation\ValidationException::withMessages($error),
+                $failures
+            );
+        }
         return new MonthlySchedule([
             'user_id' => User::where(['email' => $row['no_hp']])->first()->id,
             'month_id' => Month::find(/* ($this->subround - 1) * 4 +  */$row['panen'])->id,
             'year_id' => Year::find($this->year)->id,
             'commodity_id' => Commodity::where(['name' => ucfirst(strtolower($row['komoditas']))])->first()->id,
-            'bs_id' => Bs::where(['long_code' => ($row['kode_kec'] . $row['kode_desa'] . $row['nbs'])])->first()->id,
+            'bs_id' => $bs->id,
             'address' => $row['alamat'],
             'name' => $row['nama_krt'],
             'nks' => $row['nks'],
