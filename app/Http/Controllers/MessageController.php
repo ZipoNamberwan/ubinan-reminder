@@ -219,8 +219,15 @@ class MessageController extends Controller
                 $message[] = ["message" => $prefixadmin . $adminMessage . $suffixadmin, "phone_number" => "+6285330166644", "type" => "harvest", "sent_to" => $admin->name, "ids" => [], "role" => $admin->roles->first()->name];
             }
         }
+        if (count($transformedData['monthly']) == 0 && count($transformedData['harvest']) == 0) {
+            $admin = User::find(1);
 
-        // 85330166644
+            $prefixadmin = "Selamat pagi *Admin Survei Ubinan* 🤩🤩🤩\r\n\r\n";
+            $adminMessage = "Hari ini tidak ada reminder jadwal ubinan\r\n";
+            $suffixadmin = "\r\n\r\n*Terima kasih...*💪💪💪";
+            $message[] = ["message" => $prefixadmin . $adminMessage . $suffixadmin, "phone_number" => "+62" . $admin->phone_number, "type" => "harvest", "sent_to" => $admin->name, "ids" => [], "role" => $admin->roles->first()->name];
+            $message[] = ["message" => $prefixadmin . $adminMessage . $suffixadmin, "phone_number" => "+6285330166644", "type" => "harvest", "sent_to" => $admin->name, "ids" => [], "role" => $admin->roles->first()->name];
+        }
 
         return $message;
     }
