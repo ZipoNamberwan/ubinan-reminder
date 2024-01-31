@@ -23,16 +23,16 @@ class MessageController extends Controller
 
         $breakpoints = [];
 
-        $today = date("Y-m-d");
+        $today = date("Y-m-d", strtotime('+7 hours'));
         // $today = '2024-01-01';
 
-        $firstOfNextMonth = date("Y-m-d", strtotime("first day of next month"));
-        $firstbreakpoints = date("Y-m-d", strtotime("-7 day", strtotime($firstOfNextMonth)));
+        $firstOfNextMonth = date("Y-m-d", strtotime("+7 hours first day of next month"));
+        $firstbreakpoints = date("Y-m-d", strtotime("+7 hours -7 day", strtotime($firstOfNextMonth)));
         $breakpoints[$firstbreakpoints] = 'next';
 
-        $firstOfCurrentMonth = date("Y-m-01");
+        $firstOfCurrentMonth = date("Y-m-01", strtotime('+7 hours'));
         $begin = new DateTime($firstOfCurrentMonth);
-        $end = new DateTime(date("Y-m-t"));
+        $end = new DateTime(date("Y-m-t", strtotime('+7 hours')));
 
         $interval = DateInterval::createFromDateString('7 day');
         $period = new DatePeriod($begin, $interval, $end);
