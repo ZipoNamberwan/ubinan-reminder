@@ -37,12 +37,14 @@ class HarvestScheduleController extends Controller
         $months = Month::all();
         $years = Year::all();
         $commodities = Commodity::all();
+        $subdistricts = Subdistrict::all();
 
         $subrounds = [1, 2, 3];
 
         return view('admin.monthly-schedule-monitoring', [
             'subrounds' => $subrounds, 'currentsubround' => $currentsubround,
-            'months' => $months, 'years' => $years, 'commodities' => $commodities, 'currentyear' => $current_year
+            'months' => $months, 'years' => $years, 'commodities' => $commodities, 'currentyear' => $current_year,
+            'subdistricts' => $subdistricts
         ]);
     }
     public function deleteHarvestSchedule($id)
@@ -255,6 +257,11 @@ class HarvestScheduleController extends Controller
             $commodity = Commodity::find($request->commodity)->id;
         }
 
+        $subdistrict = null;
+        if ($request->subdistrict != null) {
+            $subdistrict = Subdistrict::find($request->subdistrict)->code;
+        }
+
         $max = $subround * 4;
         $min = $max - 3;
         $months = range($min, $max);
@@ -274,6 +281,12 @@ class HarvestScheduleController extends Controller
 
         if ($commodity != null) {
             $records = $records->where(['commodity_id' => $commodity]);
+        }
+
+        if ($subdistrict != null) {
+            $records = $records->whereHas('bs', function ($query) use ($subdistrict) {
+                return $query->where('long_code', 'LIKE', ($subdistrict . '%'));
+            });
         }
 
         $recordsTotal = $records->count();
@@ -396,6 +409,11 @@ class HarvestScheduleController extends Controller
             $commodity = Commodity::find($request->commodityhidden)->id;
         }
 
+        $subdistrict = null;
+        if ($request->subdistricthidden != 0) {
+            $subdistrict = Subdistrict::find($request->subdistricthidden)->code;
+        }
+
         $max = $subround * 4;
         $min = $max - 3;
         $months = range($min, $max);
@@ -417,8 +435,14 @@ class HarvestScheduleController extends Controller
             $schedules = $schedules->where(['commodity_id' => $commodity]);
         }
 
-        $schedules = $schedules->get();
+        if ($subdistrict != null) {
+            $schedules = $schedules->whereHas('bs', function ($query) use ($subdistrict) {
+                return $query->where('long_code', 'LIKE', ($subdistrict . '%'));
+            });
+        }
 
+        $schedules = $schedules->get();
+        dd($schedules);
         $spreadsheet = new Spreadsheet();
         $activeWorksheet = $spreadsheet->getActiveSheet()->setTitle("Palawija");
 

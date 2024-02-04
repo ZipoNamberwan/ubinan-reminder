@@ -109,6 +109,15 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <div class="col-md-2">
+                                <label class="form-control-label mb-3" for="subdistrict">Kecamatan</label>
+                                <select class="form-control d-inline" data-toggle="select" name="subdistrict" id="subdistrict">
+                                    <option value="0" selected> Semua </option>
+                                    @foreach($subdistricts as $subdistrict)
+                                    <option value="{{$subdistrict->id}}">{{$subdistrict->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
                         <div class="form-row">
                             <button onclick="getDataByFilter()" class="btn btn-primary mt-3 d-inline" type="button">
@@ -121,6 +130,7 @@
                                 <input type="hidden" name="yearhidden" id="yearhidden">
                                 <input type="hidden" name="monthhidden" id="monthhidden">
                                 <input type="hidden" name="commodityhidden" id="commodityhidden">
+                                <input type="hidden" name="subdistricthidden" id="subdistricthidden">
                                 <button onclick="downloadDataByFilter()" class="btn btn-icon btn-outline-primary mt-3" type="submit">
                                     <span class="btn-inner--icon"><i class="fas fa-download"></i></span>
                                     <span class="btn-inner--text">Download Data</span>
@@ -306,7 +316,14 @@
             commodityUrl = '&commodity=' + commodityid
         }
 
-        table.ajax.url('/jadwal-panen/data?subround=' + idsubround + '&year=' + yearid + monthUrl + commodityUrl).load();
+        var subdistrictUrl = ''
+        var e = document.getElementById('subdistrict');
+        var subdistrictid = e.options[e.selectedIndex].value;
+        if (subdistrictid != 0) {
+            subdistrictUrl = '&subdistrict=' + subdistrictid
+        }
+
+        table.ajax.url('/jadwal-panen/data?subround=' + idsubround + '&year=' + yearid + monthUrl + commodityUrl + subdistrictUrl).load();
     }
 
     function downloadDataByFilter() {
@@ -330,6 +347,11 @@
         var commodityhidden = document.getElementById('commodityhidden');
         var idcommodity = e.options[e.selectedIndex].value;
         commodityhidden.value = idcommodity;
+
+        var e = document.getElementById('subdistrict');
+        var subdistricthidden = document.getElementById('subdistricthidden');
+        var idsubdistrict = e.options[e.selectedIndex].value;
+        subdistricthidden.value = idsubdistrict;
 
         document.getElementById('downloadform').submit();
     }

@@ -70,7 +70,7 @@
                             <div class="row">
                                 <div class="col-md-6 mt-3">
                                     <label class="form-control-label" for="name">Nama <span class="text-danger">*</span></label>
-                                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" id="validationCustom03" value="{{ @old('name', $user->name) }}">
+                                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" id="name" value="{{ @old('name', $user->name) }}">
                                     @error('name')
                                     <div class="invalid-feedback">
                                         {{ $message }}
@@ -136,7 +136,7 @@
                                     <label class="form-control-label" for="password">Password <span class="text-danger">*</span>
                                         <p><small>Abaikan jika password tidak diubah, isikan password baru jika ingin password diubah</small></p>
                                     </label>
-                                    <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" id="validationCustom03" value="{{ @old('password', $user->password) }}">
+                                    <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" id="password" value="{{ @old('password', $user->password) }}">
                                     @error('password')
                                     <div class="invalid-feedback">
                                         {{ $message }}
