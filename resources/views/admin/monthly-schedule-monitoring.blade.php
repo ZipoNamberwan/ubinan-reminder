@@ -83,16 +83,45 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <div class="col-md-2">
+                                <label class="form-control-label mb-3" for="month">Bulan</label>
+                                <select class="form-control d-inline" data-toggle="select" name="month" id="month">
+                                    <option value="0" selected> Semua </option>
+                                    @foreach($months as $month)
+                                    <option value="{{$month->id}}">{{$month->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-control-label mb-3" for="year">Tahun</label>
+                                <select class="form-control d-inline" data-toggle="select" name="year" id="year">
+                                    @foreach($years as $year)
+                                    <option value="{{$year->id}}" @if($year->id==$currentyear) selected @endif>{{$year->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-control-label mb-3" for="commodity">Komoditas</label>
+                                <select class="form-control d-inline" data-toggle="select" name="commodity" id="commodity">
+                                    <option value="0" selected> Semua </option>
+                                    @foreach($commodities as $commodity)
+                                    <option value="{{$commodity->id}}">{{$commodity->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
                         <div class="form-row">
-                            <button onclick="getDataBySubround()" class="btn btn-primary mt-3 d-inline" type="button">
+                            <button onclick="getDataByFilter()" class="btn btn-primary mt-3 d-inline" type="button">
                                 <span class="btn-inner--icon"><i class="fas fa-eye"></i></span>
                                 <span class="btn-inner--text">Tampilkan</span>
                             </button>
                             <form id="downloadform" class="d-inline" method="POST" action="/jadwal-panen/data" data-toggle="tooltip" data-original-title="Unduh Jadwal Panen">
                                 @csrf
                                 <input type="hidden" name="subroundhidden" id="subroundhidden">
-                                <button onclick="downloadDataBySubround()" class="btn btn-icon btn-outline-primary mt-3" type="submit">
+                                <input type="hidden" name="yearhidden" id="yearhidden">
+                                <input type="hidden" name="monthhidden" id="monthhidden">
+                                <input type="hidden" name="commodityhidden" id="commodityhidden">
+                                <button onclick="downloadDataByFilter()" class="btn btn-icon btn-outline-primary mt-3" type="submit">
                                     <span class="btn-inner--icon"><i class="fas fa-download"></i></span>
                                     <span class="btn-inner--text">Download Data</span>
                                 </button>
@@ -256,18 +285,52 @@
         }
     });
 
-    function getDataBySubround() {
+    function getDataByFilter() {
         var e = document.getElementById('subround');
         var idsubround = e.options[e.selectedIndex].value;
-        table.ajax.url('/jadwal-panen/data/' + idsubround).load();
+
+        var monthUrl = ''
+        var e = document.getElementById('month');
+        var monthid = e.options[e.selectedIndex].value;
+        if (monthid != 0) {
+            monthUrl = '&month=' + monthid
+        }
+
+        var e = document.getElementById('year');
+        var yearid = e.options[e.selectedIndex].value;
+
+        var commodityUrl = ''
+        var e = document.getElementById('commodity');
+        var commodityid = e.options[e.selectedIndex].value;
+        if (commodityid != 0) {
+            commodityUrl = '&commodity=' + commodityid
+        }
+
+        table.ajax.url('/jadwal-panen/data?subround=' + idsubround + '&year=' + yearid + monthUrl + commodityUrl).load();
     }
 
-    function downloadDataBySubround() {
+    function downloadDataByFilter() {
         event.preventDefault();
         var e = document.getElementById('subround');
-        var hidden = document.getElementById('subroundhidden');
+        var subroundhidden = document.getElementById('subroundhidden');
         var idsubround = e.options[e.selectedIndex].value;
-        hidden.value = idsubround;
+        subroundhidden.value = idsubround;
+
+        var e = document.getElementById('month');
+        var monthhidden = document.getElementById('monthhidden');
+        var idmonth = e.options[e.selectedIndex].value;
+        monthhidden.value = idmonth;
+
+        var e = document.getElementById('year');
+        var yearhidden = document.getElementById('yearhidden');
+        var idyear = e.options[e.selectedIndex].value;
+        yearhidden.value = idyear;
+
+        var e = document.getElementById('commodity');
+        var commodityhidden = document.getElementById('commodityhidden');
+        var idcommodity = e.options[e.selectedIndex].value;
+        commodityhidden.value = idcommodity;
+
         document.getElementById('downloadform').submit();
     }
 </script>

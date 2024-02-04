@@ -30,11 +30,20 @@ class HarvestScheduleController extends Controller
     public function harvestSchedule()
     {
         $current_month = intval(date("m"));
+        $current_year = intval(date("Y"));
+        $current_year = Year::where(['name' => $current_year])->first()->id;
         $currentsubround = (int) (floor(($current_month - 1) / 4) + 1);
+
+        $months = Month::all();
+        $years = Year::all();
+        $commodities = Commodity::all();
 
         $subrounds = [1, 2, 3];
 
-        return view('admin.monthly-schedule-monitoring', ['subrounds' => $subrounds, 'currentsubround' => $currentsubround]);
+        return view('admin.monthly-schedule-monitoring', [
+            'subrounds' => $subrounds, 'currentsubround' => $currentsubround,
+            'months' => $months, 'years' => $years, 'commodities' => $commodities, 'currentyear' => $current_year
+        ]);
     }
     public function deleteHarvestSchedule($id)
     {
@@ -222,26 +231,52 @@ class HarvestScheduleController extends Controller
             abort(403);
         }
         $user = User::find(Auth::user()->id);
-        $year = Year::where(['name' => date('Y')])->first()->id;
+        $year = null;
+        if ($request->year == null) {
+            $year = Year::where(['name' => date('Y')])->first()->id;
+        } else {
+            $year = Year::find($request->year)->id;
+        }
         $subround = null;
+        $month = null;
 
         if ($request->subround != null & ($request->subround == 1 | $request->subround == 2 | $request->subround == 3)) {
             $subround = $request->subround;
+            if ($request->month != null) {
+                $month = Month::find($request->month)->id;
+            }
         } else {
             $current_month = intval(date("m"));
             $subround = (int) (floor(($current_month - 1) / 4) + 1);
+        }
+
+        $commodity = null;
+        if ($request->commodity != null) {
+            $commodity = Commodity::find($request->commodity)->id;
         }
 
         $max = $subround * 4;
         $min = $max - 3;
         $months = range($min, $max);
 
-        $recordsTotal = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->count();
+        $records = MonthlySchedule::where('id', '!=', 0);
         if ($user->hasRole('PML')) {
-            $recordsTotal = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->whereIn('user_id', $user->getPPLs->pluck('id'))->count();
+            $records = MonthlySchedule::whereIn('user_id', $user->getPPLs->pluck('id'));
         } else if ($user->hasRole('PPL')) {
-            $recordsTotal = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->where('user_id', $user->id)->count();
+            $records = MonthlySchedule::where('user_id', $user->id);
         }
+
+        if ($month != null) {
+            $records = $records->where(['year_id' => $year])->where(['month_id' => $month]);
+        } else {
+            $records = $records->where(['year_id' => $year])->whereIn('month_id', $months);
+        }
+
+        if ($commodity != null) {
+            $records = $records->where(['commodity_id' => $commodity]);
+        }
+
+        $recordsTotal = $records->count();
 
         $orderColumn = 'month_id';
         $orderDir = 'desc';
@@ -269,12 +304,7 @@ class HarvestScheduleController extends Controller
         }
 
         $searchkeyword = $request->search['value'];
-        $schedule = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->get();
-        if ($user->hasRole('PML')) {
-            $schedule = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->whereIn('user_id', $user->getPPLs->pluck('id'))->get();
-        } else if ($user->hasRole('PPL')) {
-            $schedule = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->where('user_id', $user->id)->get();
-        }
+        $schedule = $records->get();
 
         if ($searchkeyword != null) {
             $schedule = $schedule->filter(function ($q) use (
@@ -302,8 +332,6 @@ class HarvestScheduleController extends Controller
             $schedule = $schedule->skip($request->start)
                 ->take($request->length);
         }
-
-
 
         // dd($request->order);
 
@@ -343,26 +371,53 @@ class HarvestScheduleController extends Controller
     }
     public function downloadSchedule(Request $request)
     {
-        $year = Year::where(['name' => date('Y')])->first()->id;
+        $year = null;
+        if ($request->yearhidden == null) {
+            $year = Year::where(['name' => date('Y')])->first()->id;
+        } else {
+            $year = Year::find($request->yearhidden)->id;
+        }
+
         $subround = null;
+        $month = null;
 
         if ($request->subroundhidden != null & ($request->subroundhidden == 1 | $request->subroundhidden == 2 | $request->subroundhidden == 3)) {
             $subround = $request->subroundhidden;
+            if ($request->monthhidden != 0) {
+                $month = Month::find($request->monthhidden)->id;
+            }
         } else {
             $current_month = intval(date("m"));
             $subround = (int) (floor(($current_month - 1) / 4) + 1);
+        }
+
+        $commodity = null;
+        if ($request->commodityhidden != 0) {
+            $commodity = Commodity::find($request->commodityhidden)->id;
         }
 
         $max = $subround * 4;
         $min = $max - 3;
         $months = range($min, $max);
         $user = User::find(Auth::user()->id);
-        $schedules = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->get();
+        $schedules = MonthlySchedule::where('id', '!=', 0);
         if ($user->hasRole('PML')) {
-            $schedules = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->whereIn('user_id', $user->getPPLs->pluck('id'))->get();
+            $schedules = MonthlySchedule::whereIn('user_id', $user->getPPLs->pluck('id'));
         } else if ($user->hasRole('PPL')) {
-            $schedules = MonthlySchedule::where(['year_id' => $year])->whereIn('month_id', $months)->where('user_id', $user->id)->get();
+            $schedules = MonthlySchedule::where('user_id', $user->id);
         }
+
+        if ($month != null) {
+            $schedules = $schedules->where(['year_id' => $year])->where(['month_id' => $month]);
+        } else {
+            $schedules = $schedules->where(['year_id' => $year])->whereIn('month_id', $months);
+        }
+
+        if ($commodity != null) {
+            $schedules = $schedules->where(['commodity_id' => $commodity]);
+        }
+
+        $schedules = $schedules->get();
 
         $spreadsheet = new Spreadsheet();
         $activeWorksheet = $spreadsheet->getActiveSheet()->setTitle("Palawija");

@@ -36,7 +36,7 @@ Route::middleware(['auth'])->group(function () {
     Route::group(['middleware' => ['role:Admin|PML']], function () {
         Route::get('/dashboard', [HarvestScheduleController::class, 'dashboard']);
         Route::get('/jadwal-panen', [HarvestScheduleController::class, 'harvestSchedule']);
-        Route::get('/jadwal-panen/data/{subround?}', [HarvestScheduleController::class, 'getScheduleData']);
+        Route::get('/jadwal-panen/data', [HarvestScheduleController::class, 'getScheduleData']);
         Route::post('/jadwal-panen/data', [HarvestScheduleController::class, 'downloadSchedule']);
         Route::get('/reminder', [MainController::class, 'reminder']);
 

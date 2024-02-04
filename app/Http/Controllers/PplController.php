@@ -66,8 +66,22 @@ class PplController extends Controller
     function entryHarvestSchedule($id)
     {
         $schedule = MonthlySchedule::find($id);
-        $mindate = $schedule->year->name . '-' . $schedule->month->code . '-01';
-        $maxdate = date("Y-m-t", strtotime($mindate));
+        // $mindate = $schedule->year->name . '-' . $schedule->month->code . '-01';
+        // $maxdate = date("Y-m-t", strtotime($mindate));
+        $mindate = '';
+        $maxdate = '';
+        $subround = (int) (floor(($schedule->month->id - 1) / 4) + 1);
+        if ($subround == 1) {
+            $mindate = $schedule->year->name . '-01-01';
+            $maxdate = $schedule->year->name . '-04-30';
+        } else if ($subround == 2) {
+            $mindate = $schedule->year->name . '-05-01';
+            $maxdate = $schedule->year->name . '-08-31';
+        } else {
+            $mindate = $schedule->year->name . '-09-01';
+            $maxdate = $schedule->year->name . '-12-31';
+        }
+
         if ($schedule->user->id != Auth::user()->id) {
             return abort(403);
         }
