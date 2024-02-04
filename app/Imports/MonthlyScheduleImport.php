@@ -52,7 +52,7 @@ class MonthlyScheduleImport implements ToModel, WithHeadingRow, SkipsEmptyRows, 
             );
         }
         return new MonthlySchedule([
-            'user_id' => User::where(['email' => $row['no_hp']])->first()->id,
+            'user_id' => User::where(['email' => strval($row['no_hp'])])->first()->id,
             'month_id' => Month::find(/* ($this->subround - 1) * 4 +  */$row['panen'])->id,
             'year_id' => Year::find($this->year)->id,
             'commodity_id' => Commodity::where(['name' => ucfirst(strtolower($row['komoditas']))])->first()->id,

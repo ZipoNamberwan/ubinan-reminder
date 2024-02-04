@@ -51,7 +51,7 @@ class MonthlyScheduleImportPadi implements ToModel, WithHeadingRow, SkipsEmptyRo
             );
         }
         return new MonthlySchedule([
-            'user_id' => User::where(['email' => $row['no_hp']])->first()->id,
+            'user_id' => User::where(['email' => strval($row['no_hp'])])->first()->id,
             'month_id' => Month::find($row['panen'])->id,
             'year_id' => Year::find($this->year)->id,
             'commodity_id' => 1,
