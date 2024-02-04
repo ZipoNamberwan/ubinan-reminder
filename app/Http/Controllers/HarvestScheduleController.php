@@ -442,7 +442,7 @@ class HarvestScheduleController extends Controller
         }
 
         $schedules = $schedules->get();
-        dd($schedules);
+        // dd($schedules);
         $spreadsheet = new Spreadsheet();
         $activeWorksheet = $spreadsheet->getActiveSheet()->setTitle("Palawija");
 
