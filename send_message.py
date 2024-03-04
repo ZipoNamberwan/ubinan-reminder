@@ -1,7 +1,7 @@
 import pywhatkit
 import requests
 
-pywhatkit.sendwhatmsg_instantly("+6282236981385", "inisiate sending ubinan reminder messsage...", 60, True, 10)
+pywhatkit.sendwhatmsg_instantly("+6282236981385", "initiate sending ubinan reminder message...", 60, True, 10)
 
 base_url = "https://ubinan.bpskabprobolinggo.com/api/"
 response = requests.get(base_url + "message-today")
