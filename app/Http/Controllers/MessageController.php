@@ -26,7 +26,7 @@ class MessageController extends Controller
         $breakpoints = [];
 
         $today = date("Y-m-d", strtotime('+7 hours'));
-        // $today = '2024-03-07';
+        // $today = '2024-03-08';
 
         $firstOfNextMonth = date("Y-m-d", strtotime("+7 hours first day of next month"));
         $firstbreakpoints = date("Y-m-d", strtotime("+7 hours -7 day", strtotime($firstOfNextMonth)));
@@ -105,7 +105,9 @@ class MessageController extends Controller
                         $prefixppl = "Halo, *Ubinan Fighters….!!!*🤩🤩🤩 \r\n\r\nMengingaatkan kembali, bulan ini (*" . $month->name . "*) Anda masih punya *" . count($schedules) . " sampel ubinan yang belum diisi tanggal perkiraan panennya*. Berikut daftar sampel ubinan tersebut 💪💪💪 \r\n \r\n";
                     }
                     $pplMessage = implode("\r\n", $samples);
-                    $suffixppl = "\r\n\r\nMohon segera melakukan *input perkiraan tanggal panen* untuk sampel tersebut melalui link➡️ \r\n\r\n" . url("/jadwal-ubinan?month=" . $month->id) . " \r\n\r\n*Semangat Ubinan*, Huha…😸😸\r\n\r\nNb: Pesan 💚 Khusus untuk: *" . $ppl->name . "*";
+                    $rand = rand(1, $randQuoteNumMax);
+                    $quote = Quote::find($rand)->quote;
+                    $suffixppl = "\r\n\r\nMohon segera melakukan *input perkiraan tanggal panen* untuk sampel tersebut melalui link➡️ \r\n\r\n" . url("/jadwal-ubinan?month=" . $month->id) . " \r\n\r\n*Semangat Ubinan*, Huha…😸😸\r\n\r\nNb: Pesan 💚 Khusus untuk: *" . $ppl->name . "*\r\nBonus kata-kata mutiara:\r\n" . $quote;
                     $message[] = ["message" => $prefixppl . $pplMessage . $suffixppl, "phone_number" => "+62" . $ppl->phone_number, "type" => 'monthly', "sent_to" => $ppl->name, "ids" => $scheduleIds, "role" => $ppl->roles->first()->name];
 
                     $pplmap[] = ['name' => $ppl->name, 'total_sample' => count($schedules)];
