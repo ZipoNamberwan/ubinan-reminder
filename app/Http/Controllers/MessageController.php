@@ -118,7 +118,7 @@ class MessageController extends Controller
                 foreach ($pplmap as $map) {
                     $pmlMessage = $pmlMessage . "🚩*" . $map['name'] . "* : *" . $map['total_sample'] . "* sampel" . "\r\n";
                 }
-                $suffixpml = "Mohon untuk mengingatkan kembali PPL untuk menginput perkiraan tanggal panen. Sampel selengkapnya dan perkiraan tanggal panen bisa diakses melalui link berikut➡️ \r\n\r\n" . url("/jadwal-ubinan?month=" . $month->id) . " \r\n\r\nNb: Pesan 💚 Khusus untuk: *" . $pml->name . "*";
+                $suffixpml = "Mohon untuk mengingatkan kembali PPL untuk menginput perkiraan tanggal panen. Sampel selengkapnya dan perkiraan tanggal panen bisa diakses melalui link berikut➡️ \r\n\r\n" . url("/jadwal-panen") . " \r\n\r\nNb: Pesan 💚 Khusus untuk: *" . $pml->name . "*";
 
                 $message[] = ["message" => $prefixpml . $pmlMessage . $suffixpml, "phone_number" => "+62" . $pml->phone_number, "type" => "monthly", "sent_to" => $pml->name, "ids" => [], "role" => $pml->roles->first()->name];
             }
@@ -200,7 +200,7 @@ class MessageController extends Controller
                     $pmlMessage = $pmlMessage . implode("\r\n", $array);
                     $pmlMessage = $pmlMessage . "\r\n\r\n";
                 }
-                $suffixpml = "\r\nMohon untuk *mengingatkan* kembali PPL terkait jadwal panen tersebut agar tidak terlewat. Sampel selengkapnya dan perkiraan tanggal panen bisa diakses melalui link berikut➡️ \r\n\r\n" . url("/jadwal-ubinan?month=" . $month->id) .
+                $suffixpml = "\r\nMohon untuk *mengingatkan* kembali PPL terkait jadwal panen tersebut agar tidak terlewat. Sampel selengkapnya dan perkiraan tanggal panen bisa diakses melalui link berikut➡️ \r\n\r\n" . url("/jadwal-panen") .
                     " \r\n\r\n*Semangat, Fighting*💪💪💪";
 
                 $message[] = ["message" => $prefixpml . $pmlMessage . $suffixpml, "phone_number" => "+62" . $pml->phone_number, "type" => "harvest", "sent_to" => $pml->name, "ids" => [], "role" => $pml->roles->first()->name];
