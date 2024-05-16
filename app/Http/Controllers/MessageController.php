@@ -52,8 +52,6 @@ class MessageController extends Controller
         // tambahan breakpoint tanggal 20
         $breakpoints[(new DateTime($today))->setDate((new DateTime($today))->format('Y'), (new DateTime($today))->format('m'), 20)->format('Y-m-d')] = 'current';
 
-        dd($breakpoints);
-
         $message = [];
 
         $selectedBreakpoint = null;
