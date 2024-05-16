@@ -28,17 +28,18 @@ class MessageController extends Controller
         $today = date("Y-m-d", strtotime('+7 hours'));
         // $today = '2024-03-08';
 
-        $firstOfNextMonth = date("Y-m-d", strtotime("+7 hours first day of next month"));
-        $firstbreakpoints = date("Y-m-d", strtotime("+7 hours -7 day", strtotime($firstOfNextMonth)));
+        $firstOfNextMonth = (new DateTime($today))->modify('+7 hours first day of next month')->format('Y-m-d');
+
+        $firstbreakpoints = (new DateTime($today))->modify('first day of next month')->modify('+7 hours -1 week')->format('Y-m-d');
         $breakpoints[$firstbreakpoints] = 'next';
 
-        $firstOfCurrentMonth = date("Y-m-01", strtotime('+7 hours'));
-        $begin = new DateTime($firstOfCurrentMonth);
-        $end = new DateTime(date("Y-m-t", strtotime('+7 hours')));
+        $begin = (new DateTime($today))->modify('+7 hours first day of this month');
+        $end = (new DateTime($today))->modify('+7 hours last day of this month');
 
         $interval = DateInterval::createFromDateString('7 day');
         $period = new DatePeriod($begin, $interval, $end);
 
+        // breakpoint mulai tanggal 1 setiap seminggu sekali
         $i = 1;
         foreach ($period as $dt) {
             $breakpoints[$dt->format("Y-m-d")] = 'current';
@@ -47,6 +48,11 @@ class MessageController extends Controller
                 break;
             }
         }
+
+        // tambahan breakpoint tanggal 20
+        $breakpoints[(new DateTime($today))->setDate((new DateTime($today))->format('Y'), (new DateTime($today))->format('m'), 20)->format('Y-m-d')] = 'current';
+
+        dd($breakpoints);
 
         $message = [];
 
